@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SHS Lakeland — Financial Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #0a0a0b;
+      --surface: #111114;
+      --surface2: #18181c;
+      --border: #2a2a30;
+      --amber: #f59e0b;
+      --amber-dim: #92600a;
+      --amber-glow: rgba(245,158,11,0.12);
+      --amber-pale: rgba(245,158,11,0.06);
+      --red: #ef4444;
+      --red-dim: #7f1d1d;
+      --green: #22c55e;
+      --green-dim: #14532d;
+      --text: #e5e7eb;
+      --text-muted: #6b7280;
+      --text-dim: #9ca3af;
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── AUTH GATE ── */
+    #auth-gate {
+      position: fixed; inset: 0;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      flex-direction: column;
+      gap: 24px;
+    }
+    #auth-gate .logo { text-align: center; }
+    #auth-gate .logo-mark {
+      width: 56px; height: 56px;
+      background: var(--amber-glow);
+      border: 1px solid var(--amber-dim);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; margin: 0 auto 16px;
+    }
+    #auth-gate h1 { font-size: 20px; font-weight: 600; color: var(--text); }
+    #auth-gate p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+    #auth-form {
+      display: flex; flex-direction: column; gap: 12px;
+      width: 300px;
+    }
+    #auth-form input {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 15px;
+      padding: 12px 16px;
+      outline: none;
+      transition: border-color 0.15s;
+      letter-spacing: 2px;
+    }
+    #auth-form input:focus { border-color: var(--amber); }
+    #auth-form button {
+      background: var(--amber);
+      border: none;
+      border-radius: 8px;
+      color: #000;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 12px;
+      transition: opacity 0.15s;
+    }
+    #auth-form button:hover { opacity: 0.88; }
+    #auth-error {
+      color: var(--red);
+      font-size: 13px;
+      text-align: center;
+      display: none;
+    }
+
+    /* ── DASHBOARD ── */
+    #dashboard { display: none; }
+
+    /* HEADER */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky; top: 0;
+      background: rgba(10,10,11,0.92);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+    .header-left { display: flex; align-items: center; gap: 14px; }
+    .header-badge {
+      background: var(--amber-glow);
+      border: 1px solid var(--amber-dim);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 18px;
+    }
+    .header-title { font-size: 16px; font-weight: 600; line-height: 1.2; }
+    .header-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .header-right { font-size: 12px; color: var(--text-muted); text-align: right; }
+    .header-right strong { color: var(--text-dim); }
+
+    /* MAIN */
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px 64px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    /* REFI ALERT BANNER */
+    .refi-banner {
+      background: linear-gradient(135deg, rgba(245,158,11,0.1) 0%, rgba(245,158,11,0.04) 100%);
+      border: 1px solid var(--amber-dim);
+      border-radius: 12px;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .refi-icon {
+      font-size: 32px;
+      flex-shrink: 0;
+    }
+    .refi-text { flex: 1; }
+    .refi-text h3 { font-size: 15px; font-weight: 600; color: var(--amber); margin-bottom: 4px; }
+    .refi-text p { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
+    .refi-stats {
+      display: flex;
+      gap: 24px;
+      flex-shrink: 0;
+    }
+    .refi-stat { text-align: center; }
+    .refi-stat .val { font-size: 18px; font-weight: 700; color: var(--amber); }
+    .refi-stat .lbl { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+    /* SECTION LABEL */
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: -16px;
+    }
+
+    /* KPI GRID */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--amber);
+      opacity: 0.4;
+    }
+    .kpi-label { font-size: 11px; color: var(--text-muted); font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi-value { font-size: 28px; font-weight: 700; color: var(--text); margin: 8px 0 4px; line-height: 1; }
+    .kpi-value.amber { color: var(--amber); }
+    .kpi-delta {
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .kpi-delta.up { color: var(--green); }
+    .kpi-delta.down { color: var(--red); }
+    .kpi-delta.neutral { color: var(--text-muted); }
+    .kpi-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+    /* DSCR CARD — special */
+    .dscr-card {
+      grid-column: span 2;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+    .dscr-gauge-wrap { flex-shrink: 0; text-align: center; }
+    .dscr-track {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .dscr-number { font-size: 26px; font-weight: 700; }
+    .dscr-label { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+    .dscr-details { flex: 1; }
+    .dscr-details h4 { font-size: 13px; font-weight: 600; margin-bottom: 10px; }
+    .dscr-trend {
+      display: flex;
+      gap: 16px;
+    }
+    .dscr-year { text-align: center; }
+    .dscr-year .yr { font-size: 10px; color: var(--text-muted); }
+    .dscr-year .v { font-size: 16px; font-weight: 700; }
+    .dscr-year .v.green { color: var(--green); }
+    .dscr-year .v.amber { color: var(--amber); }
+    .dscr-year .v.red { color: var(--red); }
+    .dscr-arrow { align-self: center; color: var(--text-muted); font-size: 14px; }
+
+    /* CHARTS */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .chart-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .chart-card.full { grid-column: span 2; }
+    .chart-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .chart-title { font-size: 14px; font-weight: 600; }
+    .chart-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .chart-tag {
+      font-size: 10px;
+      background: var(--amber-pale);
+      border: 1px solid var(--amber-dim);
+      color: var(--amber);
+      border-radius: 4px;
+      padding: 2px 8px;
+    }
+    .chart-wrap { position: relative; height: 220px; }
+    .chart-wrap.tall { height: 300px; }
+
+    /* MONTHLY YoY TABLE */
+    .yoy-table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .yoy-table-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    thead th {
+      background: var(--surface2);
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 10px 16px;
+      text-align: right;
+    }
+    thead th:first-child { text-align: left; }
+    tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--amber-pale); }
+    tbody td { padding: 10px 16px; text-align: right; }
+    tbody td:first-child { text-align: left; color: var(--text-dim); font-weight: 500; }
+    .pos { color: var(--green); font-weight: 600; }
+    .neg { color: var(--red); font-weight: 600; }
+    .neu { color: var(--text-muted); }
+
+    /* LOAN DETAILS */
+    .loan-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .loan-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .loan-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+    .loan-value { font-size: 20px; font-weight: 700; color: var(--text); margin-top: 6px; }
+    .loan-value.amber { color: var(--amber); }
+    .loan-note { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+    .loan-progress-wrap { margin-top: 10px; }
+    .loan-progress-bar {
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .loan-progress-fill {
+      height: 100%;
+      background: var(--amber);
+      border-radius: 3px;
+    }
+    .loan-progress-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 20px 32px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      header { padding: 16px 20px; }
+      main { padding: 20px 16px 48px; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .chart-grid { grid-template-columns: 1fr; }
+      .chart-card.full { grid-column: span 1; }
+      .dscr-card { grid-column: span 2; }
+      .loan-grid { grid-template-columns: 1fr 1fr; }
+      .refi-stats { display: none; }
+    }
+    @media (max-width: 580px) {
+      .kpi-grid { grid-template-columns: 1fr 1fr; }
+      .dscr-card { flex-direction: column; }
+      .loan-grid { grid-template-columns: 1fr; }
+      .kpi-value { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- AUTH GATE -->
+<div id="auth-gate">
+  <div class="logo">
+    <div class="logo-mark">🏨</div>
+    <h1>SHS Lakeland</h1>
+    <p>Lakeland Hospitality Group · Confidential</p>
+  </div>
+  <form id="auth-form" onsubmit="checkAuth(event)">
+    <input type="password" id="pw-input" placeholder="Password" autocomplete="current-password" autofocus />
+    <button type="submit">Access Dashboard</button>
+    <div id="auth-error">Incorrect password. Try again.</div>
+  </form>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <header>
+    <div class="header-left">
+      <div class="header-badge">🏨</div>
+      <div>
+        <div class="header-title">Spring Hill Suites — Lakeland, FL</div>
+        <div class="header-sub">124 Rooms · Marriott Select Service · Lakeland Hospitality Group</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <strong>Data through Feb 2026</strong><br>
+      Debt service $967,749/yr · Matures Sep 2027
+    </div>
+  </header>
+
+  <main>
+
+    <!-- REFI BANNER -->
+    <div class="refi-banner">
+      <div class="refi-icon">⏳</div>
+      <div class="refi-text">
+        <h3>Refinance Window — 18 Months Out</h3>
+        <p>Loan matures <strong>Sep 15, 2027</strong>. Refi flag set for <strong>Feb 1, 2027</strong> with target close <strong>May 2027</strong>. 
+           Current balance <strong>$13,408,631</strong> at 3.25% fixed. Friendly bank relationship in place. 
+           DSCR is declining — lender conversations should begin <strong>Q4 2026</strong>.</p>
+      </div>
+      <div class="refi-stats">
+        <div class="refi-stat">
+          <div class="val">$13.4M</div>
+          <div class="lbl">Balance</div>
+        </div>
+        <div class="refi-stat">
+          <div class="val">3.25%</div>
+          <div class="lbl">Rate</div>
+        </div>
+        <div class="refi-stat">
+          <div class="val">Sep '27</div>
+          <div class="lbl">Maturity</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOP KPIs -->
+    <div class="section-label">2025 Full Year</div>
+    <div class="kpi-grid" id="kpi-grid">
+      <!-- Populated by JS -->
+    </div>
+
+    <!-- 2026 EARLY SIGNAL -->
+    <div class="section-label">2026 Early Signal (Jan–Feb YoY)</div>
+    <div class="kpi-grid" id="kpi-2026">
+      <!-- Populated by JS -->
+    </div>
+
+    <!-- REVENUE & NOI CHARTS -->
+    <div class="section-label">Year-over-Year Trends (2023–2025)</div>
+    <div class="chart-grid">
+      <div class="chart-card full">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Annual Revenue &amp; NOP</div>
+            <div class="chart-sub">Total revenue vs Net Operating Profit — YoY comparison</div>
+          </div>
+          <span class="chart-tag">YoY Only</span>
+        </div>
+        <div class="chart-wrap tall">
+          <canvas id="revNopChart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">DSCR Trend</div>
+            <div class="chart-sub">Debt service coverage ratio by year</div>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="dscrChart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">NOP Margin</div>
+            <div class="chart-sub">Net operating profit as % of revenue</div>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="marginChart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Occupancy — YoY</div>
+            <div class="chart-sub">Monthly occupancy % · 2023 vs 2024 vs 2025</div>
+          </div>
+          <span class="chart-tag">YoY Only</span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="occChart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">ADR &amp; RevPAR — YoY</div>
+            <div class="chart-sub">Average daily rate vs revenue per available room</div>
+          </div>
+          <span class="chart-tag">YoY Only</span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="adrChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- YoY TABLE -->
+    <div class="section-label">Monthly Revenue — YoY Detail (2024 vs 2025)</div>
+    <div class="yoy-table-wrap">
+      <div class="yoy-table-header">
+        <div>
+          <div class="chart-title">Revenue — 2024 vs 2025</div>
+          <div class="chart-sub">Month-by-month year-over-year comparison · Total Revenue</div>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table id="yoy-table">
+          <thead>
+            <tr>
+              <th>Month</th>
+              <th>2024</th>
+              <th>2025</th>
+              <th>Change $</th>
+              <th>Change %</th>
+              <th>2024 NOP</th>
+              <th>2025 NOP</th>
+              <th>NOP Δ%</th>
+            </tr>
+          </thead>
+          <tbody id="yoy-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- LOAN SECTION -->
+    <div class="section-label">Loan &amp; Debt Service</div>
+    <div class="loan-grid">
+      <div class="loan-card">
+        <div class="loan-label">Current Balance</div>
+        <div class="loan-value amber">$13,408,631</div>
+        <div class="loan-note">$16M original · Jan 2019</div>
+        <div class="loan-progress-wrap">
+          <div class="loan-progress-bar">
+            <div class="loan-progress-fill" style="width: 16.2%"></div>
+          </div>
+          <div class="loan-progress-labels">
+            <span>$13.4M remaining</span>
+            <span>16.2% paid</span>
+          </div>
+        </div>
+      </div>
+      <div class="loan-card">
+        <div class="loan-label">Annual Debt Service</div>
+        <div class="loan-value">$967,749</div>
+        <div class="loan-note">$80,646/mo · 3.25% fixed rate</div>
+      </div>
+      <div class="loan-card">
+        <div class="loan-label">Maturity</div>
+        <div class="loan-value amber">Sep 15, 2027</div>
+        <div class="loan-note">Refi flag: Feb 1, 2027 · Target close: May 2027</div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    Spring Hill Suites by Marriott — Lakeland, FL · Lakeland Hospitality Group · Confidential
+  </footer>
+</div>
+
+<script>
+// ─── AUTH ───────────────────────────────────────────────────────────────────
+function checkAuth(e) {
+  e.preventDefault();
+  const pw = document.getElementById('pw-input').value.trim();
+  if (pw === 'bfp2026') {
+    document.getElementById('auth-gate').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    initDashboard();
+  } else {
+    const err = document.getElementById('auth-error');
+    err.style.display = 'block';
+    document.getElementById('pw-input').value = '';
+    setTimeout(() => { err.style.display = 'none'; }, 3000);
+  }
+}
+
+// ─── DATA ────────────────────────────────────────────────────────────────────
+// All monetary values in dollars (already divided from cents)
+// ADR/RevPAR in dollars (divided from cents where stored)
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+const annual = {
+  2023: { rev: 6971203, nop: 1878518, gop: 3414247, dscr: 1.94, nopMargin: 0.269, avgOcc: 0.801 },
+  2024: { rev: 7069412, nop: 1828581, gop: 3398189, dscr: 1.89, nopMargin: 0.259, avgOcc: 0.801 },
+  2025: { rev: 6884571, nop: 1640281, gop: 3197070, dscr: 1.69, nopMargin: 0.238, avgOcc: 0.780 },
+};
+
+// Monthly data for 2024 and 2025
+const monthly = {
+  2024: [
+    { m:1,  rev: 559126, nop:  50491, occ: 0.7672, adr: 160.83, revpar: 123.40 },
+    { m:2,  rev: 703287, nop: 256709, occ: 0.8761, adr: 195.65, revpar: 171.42 },
+    { m:3,  rev: 725257, nop: 280200, occ: 0.8402, adr: 201.54, revpar: 169.34 },
+    { m:4,  rev: 841632, nop: 361683, occ: 0.8315, adr: 238.24, revpar: 198.11 },
+    { m:5,  rev: 548849, nop: 128261, occ: 0.7496, adr: 164.95, revpar: 123.65 },
+    { m:6,  rev: 572662, nop: 150339, occ: 0.7959, adr: 165.56, revpar: 131.77 },
+    { m:7,  rev: 416212, nop:  27570, occ: 0.6806, adr: 140.71, revpar:  95.77 },
+    { m:8,  rev: 436349, nop:  35647, occ: 0.7077, adr: 138.40, revpar:  97.94 },
+    { m:9,  rev: 489491, nop:  92595, occ: 0.8095, adr: 142.15, revpar: 115.07 },
+    { m:10, rev: 671170, nop: 222852, occ: 0.9077, adr: 165.97, revpar: 150.65 },
+    { m:11, rev: 542839, nop: 141312, occ: 0.8395, adr: 152.62, revpar: 128.12 },
+    { m:12, rev: 562538, nop:  80922, occ: 0.8040, adr: 154.68, revpar: 124.36 },
+  ],
+  2025: [
+    { m:1,  rev: 622738, nop: 116589, occ: 0.8258, adr: 168.17, revpar: 138.88 },
+    { m:2,  rev: 751384, nop: 317523, occ: 0.9173, adr: 205.77, revpar: 188.75 },
+    { m:3,  rev: 846744, nop: 354299, occ: 0.9270, adr: 210.88, revpar: 195.49 },
+    { m:4,  rev: 748151, nop: 276035, occ: 0.7969, adr: 223.85, revpar: 178.39 },
+    { m:5,  rev: 620932, nop: 158923, occ: 0.7993, adr: 165.44, revpar: 132.23 },
+    { m:6,  rev: 510305, nop:  24272, occ: 0.7623, adr: 158.01, revpar: 120.45 },
+    { m:7,  rev: 396685, nop:   7702, occ: 0.6663, adr: 137.55, revpar:  91.64 },
+    { m:8,  rev: 489670, nop:  49190, occ: 0.7856, adr: 144.00, revpar: 113.13 },
+    { m:9,  rev: 404814, nop:    480, occ: 0.6997, adr: 132.66, revpar:  92.83 },
+    { m:10, rev: 545593, nop:  81469, occ: 0.8055, adr: 152.04, revpar: 122.47 },
+    { m:11, rev: 532780, nop: 158820, occ: 0.7369, adr: 165.45, revpar: 121.92 },
+    { m:12, rev: 414775, nop:  94979, occ: 0.6429, adr: 145.74, revpar:  93.70 },
+  ],
+  2023: [
+    { m:1,  rev: 544890, nop:  83592, occ: 0.8035, adr: 150.21, revpar: 120.69 },
+    { m:2,  rev: 688385, nop: 239907, occ: 0.8956, adr: 197.21, revpar: 176.63 },
+    { m:3,  rev: 940484, nop: 479063, occ: 0.9136, adr: 248.99, revpar: 227.51 },
+    { m:4,  rev: 623940, nop: 194097, occ: 0.7733, adr: 191.20, revpar: 147.86 },
+    { m:5,  rev: 528373, nop: 108895, occ: 0.7439, adr: 158.91, revpar: 118.22 },
+    { m:6,  rev: 538036, nop: 129402, occ: 0.8359, adr: 154.38, revpar: 129.04 },
+    { m:7,  rev: 488821, nop:  91627, occ: 0.7757, adr: 140.54, revpar: 109.02 },
+    { m:8,  rev: 465115, nop:  45392, occ: 0.7759, adr: 133.08, revpar: 103.26 },
+    { m:9,  rev: 568622, nop: 158464, occ: 0.7885, adr: 167.33, revpar: 131.95 },
+    { m:10, rev: 568622, nop: 158464, occ: 0.7886, adr: 162.17, revpar: 127.89 },
+    { m:11, rev: 535669, nop: 142205, occ: 0.7692, adr: 153.62, revpar: 118.17 },
+    { m:12, rev: 480246, nop:  47410, occ: 0.7491, adr: 144.41, revpar: 108.18 },
+  ],
+};
+
+const data2026 = {
+  rev: 1389498, nop: 505672,
+  occ: 0.860, adr: ((17029+21435)/2)/100,
+};
+
+// ─── CHART DEFAULTS ──────────────────────────────────────────────────────────
+const AMBER = '#f59e0b';
+const AMBER2 = 'rgba(245,158,11,0.7)';
+const AMBER3 = 'rgba(245,158,11,0.3)';
+const GREEN = '#22c55e';
+const RED = '#ef4444';
+const BLUE = '#60a5fa';
+const PURPLE = '#a78bfa';
+
+Chart.defaults.color = '#6b7280';
+Chart.defaults.borderColor = '#2a2a30';
+Chart.defaults.font.family = "'Inter', system-ui, sans-serif";
+Chart.defaults.font.size = 11;
+
+function fmt$(n) {
+  if (n >= 1e6) return '$' + (n/1e6).toFixed(2) + 'M';
+  if (n >= 1e3) return '$' + (n/1e3).toFixed(0) + 'K';
+  return '$' + n.toFixed(0);
+}
+function pct(n) { return (n*100).toFixed(1) + '%'; }
+function fmtDelta(n, prefix='') {
+  const sign = n >= 0 ? '+' : '';
+  return prefix + sign + n.toFixed(1) + '%';
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+function initDashboard() {
+  buildKPIs();
+  build2026KPIs();
+  buildRevNopChart();
+  buildDSCRChart();
+  buildMarginChart();
+  buildOccChart();
+  buildADRChart();
+  buildYoYTable();
+}
+
+// ─── KPIs (2025) ─────────────────────────────────────────────────────────────
+function buildKPIs() {
+  const a25 = annual[2025];
+  const a24 = annual[2024];
+
+  const revChg = (a25.rev / a24.rev - 1) * 100;
+  const nopChg = (a25.nop / a24.nop - 1) * 100;
+
+  const cards = [
+    {
+      label: 'Total Revenue',
+      value: fmt$(a25.rev),
+      delta: fmtDelta(revChg),
+      deltaDir: revChg >= 0 ? 'up' : 'down',
+      sub: 'vs 2024 · YoY',
+    },
+    {
+      label: 'Net Operating Profit',
+      value: fmt$(a25.nop),
+      delta: fmtDelta(nopChg),
+      deltaDir: nopChg >= 0 ? 'up' : 'down',
+      sub: 'vs 2024 · YoY',
+    },
+    {
+      label: 'NOP Margin',
+      value: pct(a25.nopMargin),
+      delta: fmtDelta((a25.nopMargin - a24.nopMargin) * 100, ''),
+      deltaClass: a25.nopMargin >= a24.nopMargin ? 'up' : 'down',
+      sub: '2024 was 25.9%',
+      deltaDir: a25.nopMargin >= a24.nopMargin ? 'up' : 'down',
+    },
+    {
+      label: 'Avg Occupancy',
+      value: pct(a25.avgOcc),
+      delta: fmtDelta((a25.avgOcc - a24.avgOcc) * 100),
+      deltaDir: a25.avgOcc >= a24.avgOcc ? 'up' : 'down',
+      sub: '2024 was 80.1%',
+    },
+  ];
+
+  const grid = document.getElementById('kpi-grid');
+  grid.innerHTML = cards.map(c => `
+    <div class="kpi-card">
+      <div class="kpi-label">${c.label}</div>
+      <div class="kpi-value">${c.value}</div>
+      <div class="kpi-delta ${c.deltaDir}">${c.deltaDir === 'up' ? '▲' : '▼'} ${c.delta}</div>
+      <div class="kpi-sub">${c.sub}</div>
+    </div>
+  `).join('');
+}
+
+// ─── 2026 KPIs ───────────────────────────────────────────────────────────────
+function build2026KPIs() {
+  // Jan+Feb 2025 for comparison
+  const rev25 = monthly[2025][0].rev + monthly[2025][1].rev;
+  const nop25 = monthly[2025][0].nop + monthly[2025][1].nop;
+  const occ25 = (monthly[2025][0].occ + monthly[2025][1].occ) / 2;
+
+  const revChg = (data2026.rev / rev25 - 1) * 100;
+  const nopChg = (data2026.nop / nop25 - 1) * 100;
+  const occChg = (data2026.occ - occ25) * 100;
+
+  const cards = [
+    {
+      label: '2026 Revenue (Jan–Feb)',
+      value: fmt$(data2026.rev),
+      delta: fmtDelta(revChg),
+      deltaDir: revChg >= 0 ? 'up' : 'down',
+      sub: 'vs 2025 Jan–Feb',
+    },
+    {
+      label: '2026 NOP (Jan–Feb)',
+      value: fmt$(data2026.nop),
+      delta: fmtDelta(nopChg),
+      deltaDir: nopChg >= 0 ? 'up' : 'down',
+      sub: 'vs 2025 Jan–Feb · +16.5%',
+      amber: true,
+    },
+    {
+      label: '2026 Avg Occupancy',
+      value: pct(data2026.occ),
+      delta: fmtDelta(occChg),
+      deltaDir: occChg >= 0 ? 'up' : 'down',
+      sub: 'vs 2025 Jan–Feb',
+      amber: true,
+    },
+    {
+      label: '2026 Avg ADR',
+      value: '$' + data2026.adr.toFixed(2),
+      delta: '',
+      deltaDir: 'neutral',
+      sub: 'Jan–Feb average',
+    },
+  ];
+
+  const grid = document.getElementById('kpi-2026');
+  grid.innerHTML = cards.map(c => `
+    <div class="kpi-card">
+      <div class="kpi-label">${c.label}</div>
+      <div class="kpi-value ${c.amber ? 'amber' : ''}">${c.value}</div>
+      ${c.delta ? `<div class="kpi-delta ${c.deltaDir}">${c.deltaDir === 'up' ? '▲' : (c.deltaDir === 'down' ? '▼' : '')} ${c.delta}</div>` : ''}
+      <div class="kpi-sub">${c.sub}</div>
+    </div>
+  `).join('');
+}
+
+// ─── REV + NOP CHART ─────────────────────────────────────────────────────────
+function buildRevNopChart() {
+  const ctx = document.getElementById('revNopChart').getContext('2d');
+  const labels = ['2023', '2024', '2025'];
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Total Revenue',
+          data: [annual[2023].rev, annual[2024].rev, annual[2025].rev],
+          backgroundColor: 'rgba(245,158,11,0.25)',
+          borderColor: AMBER,
+          borderWidth: 2,
+          borderRadius: 6,
+        },
+        {
+          label: 'Net Operating Profit',
+          data: [annual[2023].nop, annual[2024].nop, annual[2025].nop],
+          backgroundColor: 'rgba(34,197,94,0.25)',
+          borderColor: GREEN,
+          borderWidth: 2,
+          borderRadius: 6,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: '#9ca3af', boxWidth: 12, padding: 16 } },
+        tooltip: {
+          callbacks: {
+            label: ctx => ' ' + ctx.dataset.label + ': ' + fmt$(ctx.raw),
+          },
+        },
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280' } },
+        y: {
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: { color: '#6b7280', callback: v => fmt$(v) },
+        },
+      },
+    },
+  });
+}
+
+// ─── DSCR CHART ──────────────────────────────────────────────────────────────
+function buildDSCRChart() {
+  const ctx = document.getElementById('dscrChart').getContext('2d');
+  const labels = ['2023', '2024', '2025'];
+  const vals = [1.94, 1.89, 1.69];
+  const colors = vals.map(v => v >= 2.0 ? GREEN : v >= 1.5 ? AMBER : RED);
+
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'DSCR',
+        data: vals,
+        backgroundColor: colors.map(c => c + '44'),
+        borderColor: colors,
+        borderWidth: 2,
+        borderRadius: 6,
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ' DSCR: ' + ctx.raw.toFixed(2) + '×' } },
+        annotation: {},
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280' } },
+        y: {
+          min: 0, max: 2.5,
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: { color: '#6b7280', callback: v => v.toFixed(1) + '×' },
+        },
+      },
+    },
+    plugins: [{
+      id: 'threshold',
+      afterDraw(chart) {
+        const { ctx, chartArea: { left, right }, scales: { y } } = chart;
+        const y1 = y.getPixelForValue(1.0);
+        ctx.save();
+        ctx.strokeStyle = RED;
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4,4]);
+        ctx.beginPath(); ctx.moveTo(left, y1); ctx.lineTo(right, y1); ctx.stroke();
+        ctx.fillStyle = RED;
+        ctx.font = '10px Inter, system-ui';
+        ctx.fillText('1.0× min', right - 52, y1 - 4);
+        const y2 = y.getPixelForValue(1.25);
+        ctx.strokeStyle = AMBER;
+        ctx.beginPath(); ctx.moveTo(left, y2); ctx.lineTo(right, y2); ctx.stroke();
+        ctx.fillStyle = AMBER;
+        ctx.fillText('1.25× threshold', right - 84, y2 - 4);
+        ctx.restore();
+      },
+    }],
+  });
+}
+
+// ─── MARGIN CHART ────────────────────────────────────────────────────────────
+function buildMarginChart() {
+  const ctx = document.getElementById('marginChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['2023', '2024', '2025'],
+      datasets: [
+        {
+          label: 'NOP Margin',
+          data: [26.9, 25.9, 23.8],
+          borderColor: AMBER,
+          backgroundColor: AMBER3,
+          borderWidth: 2,
+          pointBackgroundColor: AMBER,
+          fill: true,
+          tension: 0.3,
+        },
+        {
+          label: 'GOP Margin',
+          data: [
+            (annual[2023].gop/annual[2023].rev*100).toFixed(1),
+            (annual[2024].gop/annual[2024].rev*100).toFixed(1),
+            (annual[2025].gop/annual[2025].rev*100).toFixed(1),
+          ],
+          borderColor: BLUE,
+          backgroundColor: 'rgba(96,165,250,0.1)',
+          borderWidth: 2,
+          pointBackgroundColor: BLUE,
+          fill: true,
+          tension: 0.3,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: '#9ca3af', boxWidth: 12, padding: 12 } },
+        tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + ctx.raw + '%' } },
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280' } },
+        y: {
+          min: 15, max: 55,
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: { color: '#6b7280', callback: v => v + '%' },
+        },
+      },
+    },
+  });
+}
+
+// ─── OCCUPANCY CHART ─────────────────────────────────────────────────────────
+function buildOccChart() {
+  const ctx = document.getElementById('occChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: MONTHS,
+      datasets: [
+        {
+          label: '2023',
+          data: monthly[2023].map(d => (d.occ * 100).toFixed(1)),
+          borderColor: 'rgba(96,165,250,0.7)',
+          backgroundColor: 'transparent',
+          borderWidth: 1.5,
+          pointRadius: 2,
+          tension: 0.3,
+        },
+        {
+          label: '2024',
+          data: monthly[2024].map(d => (d.occ * 100).toFixed(1)),
+          borderColor: 'rgba(167,139,250,0.8)',
+          backgroundColor: 'transparent',
+          borderWidth: 1.5,
+          pointRadius: 2,
+          tension: 0.3,
+        },
+        {
+          label: '2025',
+          data: monthly[2025].map(d => (d.occ * 100).toFixed(1)),
+          borderColor: AMBER,
+          backgroundColor: AMBER3,
+          borderWidth: 2,
+          pointRadius: 3,
+          fill: true,
+          tension: 0.3,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: '#9ca3af', boxWidth: 10, padding: 12 } },
+        tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + ctx.raw + '%' } },
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280' } },
+        y: {
+          min: 50, max: 100,
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: { color: '#6b7280', callback: v => v + '%' },
+        },
+      },
+    },
+  });
+}
+
+// ─── ADR / REVPAR CHART ──────────────────────────────────────────────────────
+function buildADRChart() {
+  const ctx = document.getElementById('adrChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: MONTHS,
+      datasets: [
+        {
+          label: '2024 ADR',
+          data: monthly[2024].map(d => d.adr.toFixed(2)),
+          borderColor: 'rgba(167,139,250,0.7)',
+          backgroundColor: 'transparent',
+          borderWidth: 1.5,
+          pointRadius: 2,
+          tension: 0.3,
+        },
+        {
+          label: '2025 ADR',
+          data: monthly[2025].map(d => d.adr.toFixed(2)),
+          borderColor: AMBER,
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          pointRadius: 3,
+          tension: 0.3,
+        },
+        {
+          label: '2025 RevPAR',
+          data: monthly[2025].map(d => d.revpar.toFixed(2)),
+          borderColor: GREEN,
+          backgroundColor: 'rgba(34,197,94,0.1)',
+          borderWidth: 1.5,
+          borderDash: [4,3],
+          pointRadius: 2,
+          fill: true,
+          tension: 0.3,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: '#9ca3af', boxWidth: 10, padding: 12 } },
+        tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ': $' + ctx.raw } },
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280' } },
+        y: {
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: { color: '#6b7280', callback: v => '$' + v },
+        },
+      },
+    },
+  });
+}
+
+// ─── YoY TABLE ───────────────────────────────────────────────────────────────
+function buildYoYTable() {
+  const tbody = document.getElementById('yoy-tbody');
+  const rows = MONTHS.map((m, i) => {
+    const d24 = monthly[2024][i];
+    const d25 = monthly[2025][i];
+    const revDelta = d25.rev - d24.rev;
+    const revDeltaPct = (revDelta / d24.rev) * 100;
+    const nopDeltaPct = d24.nop > 0 ? ((d25.nop - d24.nop) / d24.nop) * 100 : null;
+    const revClass = revDeltaPct >= 0 ? 'pos' : 'neg';
+    const nopClass = nopDeltaPct === null ? 'neu' : (nopDeltaPct >= 0 ? 'pos' : 'neg');
+
+    return `<tr>
+      <td>${m}</td>
+      <td>${fmt$(d24.rev)}</td>
+      <td>${fmt$(d25.rev)}</td>
+      <td class="${revClass}">${revDelta >= 0 ? '+' : ''}${fmt$(revDelta)}</td>
+      <td class="${revClass}">${revDeltaPct >= 0 ? '+' : ''}${revDeltaPct.toFixed(1)}%</td>
+      <td>${fmt$(d24.nop)}</td>
+      <td>${fmt$(d25.nop)}</td>
+      <td class="${nopClass}">${nopDeltaPct !== null ? (nopDeltaPct >= 0 ? '+' : '') + nopDeltaPct.toFixed(1) + '%' : '—'}</td>
+    </tr>`;
+  });
+  tbody.innerHTML = rows.join('');
+}
+</script>
+</body>
+</html>

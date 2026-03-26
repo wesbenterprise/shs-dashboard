@@ -1,0 +1,1864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SHS Lakeland — Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #0a0a0b;
+      --surface: #111114;
+      --surface2: #18181c;
+      --border: #2a2a30;
+      --amber: #f59e0b;
+      --amber-dim: #92600a;
+      --amber-glow: rgba(245,158,11,0.12);
+      --amber-pale: rgba(245,158,11,0.06);
+      --red: #ef4444;
+      --red-dim: #7f1d1d;
+      --green: #22c55e;
+      --green-dim: #14532d;
+      --text: #e5e7eb;
+      --text-muted: #6b7280;
+      --text-dim: #9ca3af;
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── AUTH GATE ── */
+    #auth-gate {
+      position: fixed; inset: 0;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      flex-direction: column;
+      gap: 24px;
+    }
+    #auth-gate .logo { text-align: center; }
+    #auth-gate .logo-mark {
+      width: 56px; height: 56px;
+      background: var(--amber-glow);
+      border: 1px solid var(--amber-dim);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; margin: 0 auto 16px;
+    }
+    #auth-gate h1 { font-size: 20px; font-weight: 600; color: var(--text); }
+    #auth-gate p { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+    #auth-form {
+      display: flex; flex-direction: column; gap: 12px;
+      width: 300px;
+    }
+    #auth-form input {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 15px;
+      padding: 12px 16px;
+      outline: none;
+      transition: border-color 0.15s;
+      letter-spacing: 2px;
+    }
+    #auth-form input:focus { border-color: var(--amber); }
+    #auth-form button {
+      background: var(--amber);
+      border: none;
+      border-radius: 8px;
+      color: #000;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 12px;
+      transition: opacity 0.15s;
+    }
+    #auth-form button:hover { opacity: 0.88; }
+    #auth-error {
+      color: var(--red);
+      font-size: 13px;
+      text-align: center;
+      display: none;
+    }
+
+    /* ── DASHBOARD ── */
+    #dashboard { display: none; }
+
+    /* HEADER */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky; top: 0;
+      background: rgba(10,10,11,0.92);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+    .header-left { display: flex; align-items: center; gap: 14px; }
+    .header-badge {
+      background: var(--amber-glow);
+      border: 1px solid var(--amber-dim);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 18px;
+    }
+    .header-title { font-size: 16px; font-weight: 600; line-height: 1.2; }
+    .header-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .header-right { font-size: 12px; color: var(--text-muted); text-align: right; }
+    .header-right strong { color: var(--text-dim); }
+
+    /* MAIN */
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px 64px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    /* REFI ALERT BANNER */
+    .refi-banner {
+      background: linear-gradient(135deg, rgba(245,158,11,0.1) 0%, rgba(245,158,11,0.04) 100%);
+      border: 1px solid var(--amber-dim);
+      border-radius: 12px;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .refi-icon {
+      font-size: 32px;
+      flex-shrink: 0;
+    }
+    .refi-text { flex: 1; }
+    .refi-text h3 { font-size: 15px; font-weight: 600; color: var(--amber); margin-bottom: 4px; }
+    .refi-text p { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
+    .refi-stats {
+      display: flex;
+      gap: 24px;
+      flex-shrink: 0;
+    }
+    .refi-stat { text-align: center; }
+    .refi-stat .val { font-size: 18px; font-weight: 700; color: var(--amber); }
+    .refi-stat .lbl { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+    /* SECTION LABEL */
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: -16px;
+    }
+
+    /* KPI GRID */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--amber);
+      opacity: 0.4;
+    }
+    .kpi-label { font-size: 11px; color: var(--text-muted); font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi-value { font-size: 28px; font-weight: 700; color: var(--text); margin: 8px 0 4px; line-height: 1; }
+    .kpi-value.amber { color: var(--amber); }
+    .kpi-delta {
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .kpi-delta.up { color: var(--green); }
+    .kpi-delta.down { color: var(--red); }
+    .kpi-delta.neutral { color: var(--text-muted); }
+    .kpi-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+    /* DSCR CARD — special */
+    .dscr-card {
+      grid-column: span 2;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+    .dscr-gauge-wrap { flex-shrink: 0; text-align: center; }
+    .dscr-track {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .dscr-number { font-size: 26px; font-weight: 700; }
+    .dscr-label { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+    .dscr-details { flex: 1; }
+    .dscr-details h4 { font-size: 13px; font-weight: 600; margin-bottom: 10px; }
+    .dscr-trend {
+      display: flex;
+      gap: 16px;
+    }
+    .dscr-year { text-align: center; }
+    .dscr-year .yr { font-size: 10px; color: var(--text-muted); }
+    .dscr-year .v { font-size: 16px; font-weight: 700; }
+    .dscr-year .v.green { color: var(--green); }
+    .dscr-year .v.amber { color: var(--amber); }
+    .dscr-year .v.red { color: var(--red); }
+    .dscr-arrow { align-self: center; color: var(--text-muted); font-size: 14px; }
+
+    /* CHARTS */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .chart-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .chart-card.full { grid-column: span 2; }
+    .chart-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .chart-title { font-size: 14px; font-weight: 600; }
+    .chart-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .chart-tag {
+      font-size: 10px;
+      background: var(--amber-pale);
+      border: 1px solid var(--amber-dim);
+      color: var(--amber);
+      border-radius: 4px;
+      padding: 2px 8px;
+    }
+    .chart-wrap { position: relative; height: 220px; }
+    .chart-wrap.tall { height: 300px; }
+
+    /* MONTHLY YoY TABLE */
+    .yoy-table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .yoy-table-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    thead th {
+      background: var(--surface2);
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 10px 16px;
+      text-align: right;
+    }
+    thead th:first-child { text-align: left; }
+    tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--amber-pale); }
+    tbody td { padding: 10px 16px; text-align: right; }
+    tbody td:first-child { text-align: left; color: var(--text-dim); font-weight: 500; }
+    .pos { color: var(--green); font-weight: 600; }
+    .neg { color: var(--red); font-weight: 600; }
+    .neu { color: var(--text-muted); }
+
+    /* LOAN DETAILS */
+    .loan-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .loan-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .loan-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+    .loan-value { font-size: 20px; font-weight: 700; color: var(--text); margin-top: 6px; }
+    .loan-value.amber { color: var(--amber); }
+    .loan-note { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+    .loan-progress-wrap { margin-top: 10px; }
+    .loan-progress-bar {
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .loan-progress-fill {
+      height: 100%;
+      background: var(--amber);
+      border-radius: 3px;
+    }
+    .loan-progress-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* ── TAB NAV ── */
+    .tab-nav {
+      display: flex;
+      gap: 4px;
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      background: var(--surface);
+      position: sticky;
+      top: 61px;
+      z-index: 99;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-family: var(--font);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 12px 16px;
+      transition: color 0.15s, border-color 0.15s;
+      margin-bottom: -1px;
+      white-space: nowrap;
+    }
+    .tab-btn:hover { color: var(--text-dim); }
+    .tab-btn.active {
+      border-bottom-color: var(--amber);
+      color: var(--amber);
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── STR SPECIFIC ── */
+    .str-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    .str-kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .str-kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--amber);
+      opacity: 0.4;
+    }
+    .str-kpi-label { font-size: 11px; color: var(--text-muted); font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; }
+    .str-kpi-value { font-size: 28px; font-weight: 700; color: var(--text); margin: 8px 0 4px; line-height: 1; }
+    .str-kpi-value.amber { color: var(--amber); }
+    .str-kpi-index { font-size: 13px; font-weight: 600; margin-top: 4px; }
+    .str-kpi-index.above { color: var(--green); }
+    .str-kpi-index.below { color: var(--red); }
+    .str-kpi-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+    .str-best-worst-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .str-bw-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+    .str-bw-section { padding: 16px 20px; }
+    .str-bw-section:first-child { border-right: 1px solid var(--border); }
+    .str-bw-title { font-size: 13px; font-weight: 600; margin-bottom: 12px; }
+    .str-bw-title.gold { color: var(--amber); }
+    .str-bw-title.dim { color: var(--text-muted); }
+    .str-bw-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-size: 12px;
+    }
+    .str-bw-row:last-child { border-bottom: none; }
+    .str-bw-week { color: var(--text-dim); }
+    .str-bw-metrics { display: flex; gap: 16px; align-items: center; }
+    .str-bw-rgi-best { color: var(--green); font-weight: 700; font-size: 14px; }
+    .str-bw-rgi-worst { color: var(--red); font-weight: 700; font-size: 14px; }
+    .str-bw-detail { color: var(--text-muted); font-size: 11px; }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 20px 32px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      header { padding: 16px 20px; }
+      main { padding: 20px 16px 48px; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .chart-grid { grid-template-columns: 1fr; }
+      .chart-card.full { grid-column: span 1; }
+      .dscr-card { grid-column: span 2; }
+      .loan-grid { grid-template-columns: 1fr 1fr; }
+      .refi-stats { display: none; }
+    }
+    @media (max-width: 580px) {
+      .kpi-grid { grid-template-columns: 1fr 1fr; }
+      .dscr-card { flex-direction: column; }
+      .loan-grid { grid-template-columns: 1fr; }
+      .kpi-value { font-size: 22px; }
+    }
+  </style>
+</head>
+<body><div style="background:#1a1a2e;border-bottom:1px solid #334155;padding:8px 24px;display:flex;align-items:center;justify-content:space-between;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:12px;">
+  <span style="color:#64748b;">📋 Classic STR View — original dashboard</span>
+  <a href="/" style="color:#60a5fa;text-decoration:none;font-weight:600;">← New Intelligence View</a>
+</div>
+
+<!-- AUTH GATE -->
+<div id="auth-gate">
+  <div class="logo">
+    <div class="logo-mark">🏨</div>
+    <h1>SHS Lakeland</h1>
+    <p>Lakeland Hospitality Group · Confidential</p>
+  </div>
+  <form id="auth-form" onsubmit="checkAuth(event)">
+    <input type="password" id="pw-input" placeholder="Password" autocomplete="current-password" autofocus />
+    <button type="submit">Access Dashboard</button>
+    <div id="auth-error">Incorrect password. Try again.</div>
+  </form>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <header>
+    <div class="header-left">
+      <div class="header-badge">🏨</div>
+      <div>
+        <div class="header-title">Spring Hill Suites — Lakeland, FL</div>
+        <div class="header-sub">124 Rooms · Marriott Select Service · Lakeland Hospitality Group</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <strong>Data through Feb 2026</strong><br>
+      Debt service $967,749/yr · Matures Sep 2027
+    </div>
+  </header>
+
+  <!-- TAB NAV -->
+  <nav class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('financial', this)">📊 Financial</button>
+    <button class="tab-btn" onclick="switchTab('str', this)">🏆 STR Performance</button>
+  </nav>
+
+  <!-- FINANCIAL TAB -->
+  <div id="tab-financial" class="tab-panel active">
+  <main>
+
+    <!-- REFI BANNER -->
+    <div class="refi-banner">
+      <div class="refi-icon">⏳</div>
+      <div class="refi-text">
+        <h3>Refinance Window — 18 Months Out</h3>
+        <p>Loan matures <strong>Sep 15, 2027</strong>. Refi flag set for <strong>Feb 1, 2027</strong> with target close <strong>May 2027</strong>. 
+           Current balance <strong>$13,408,631</strong> at 3.25% fixed. Friendly bank relationship in place. 
+           DSCR is declining — lender conversations should begin <strong>Q4 2026</strong>.</p>
+      </div>
+      <div class="refi-stats">
+        <div class="refi-stat">
+          <div class="val">$13.4M</div>
+          <div class="lbl">Balance</div>
+        </div>
+        <div class="refi-stat">
+          <div class="val">3.25%</div>
+          <div class="lbl">Rate</div>
+        </div>
+        <div class="refi-stat">
+          <div class="val">Sep '27</div>
+          <div class="lbl">Maturity</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOP KPIs -->
+    <div class="section-label">2025 Full Year</div>
+    <div class="kpi-grid" id="kpi-grid">
+      <!-- Populated by JS -->
+    </div>
+
+    <!-- 2026 EARLY SIGNAL -->
+    <div class="section-label">2026 Early Signal (Jan–Feb YoY)</div>
+    <div class="kpi-grid" id="kpi-2026">
+      <!-- Populated by JS -->
+    </div>
+
+    <!-- REVENUE & NOI CHARTS -->
+    <div class="section-label">Year-over-Year Trends (2023–2025)</div>
+    <div class="chart-grid">
+      <div class="chart-card full">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Annual Revenue &amp; NOP</div>
+            <div class="chart-sub">Total revenue vs Net Operating Profit — YoY comparison</div>
+          </div>
+          <span class="chart-tag">YoY Only</span>
+        </div>
+        <div class="chart-wrap tall">
+          <canvas id="revNopChart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">DSCR Trend</div>
+            <div class="chart-sub">Debt service coverage ratio by year</div>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="dscrChart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">NOP Margin</div>
+            <div class="chart-sub">Net operating profit as % of revenue</div>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="marginChart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Occupancy — YoY</div>
+            <div class="chart-sub">Monthly occupancy % · 2023 vs 2024 vs 2025</div>
+          </div>
+          <span class="chart-tag">YoY Only</span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="occChart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">ADR &amp; RevPAR — YoY</div>
+            <div class="chart-sub">Average daily rate vs revenue per available room</div>
+          </div>
+          <span class="chart-tag">YoY Only</span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="adrChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- YoY TABLE -->
+    <div class="section-label">Monthly Revenue — YoY Detail (2024 vs 2025)</div>
+    <div class="yoy-table-wrap">
+      <div class="yoy-table-header">
+        <div>
+          <div class="chart-title">Revenue — 2024 vs 2025</div>
+          <div class="chart-sub">Month-by-month year-over-year comparison · Total Revenue</div>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table id="yoy-table">
+          <thead>
+            <tr>
+              <th>Month</th>
+              <th>2024</th>
+              <th>2025</th>
+              <th>Change $</th>
+              <th>Change %</th>
+              <th>2024 NOP</th>
+              <th>2025 NOP</th>
+              <th>NOP Δ%</th>
+            </tr>
+          </thead>
+          <tbody id="yoy-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- LOAN SECTION -->
+    <div class="section-label">Loan &amp; Debt Service</div>
+    <div class="loan-grid">
+      <div class="loan-card">
+        <div class="loan-label">Current Balance</div>
+        <div class="loan-value amber">$13,408,631</div>
+        <div class="loan-note">$16M original · Jan 2019</div>
+        <div class="loan-progress-wrap">
+          <div class="loan-progress-bar">
+            <div class="loan-progress-fill" style="width: 16.2%"></div>
+          </div>
+          <div class="loan-progress-labels">
+            <span>$13.4M remaining</span>
+            <span>16.2% paid</span>
+          </div>
+        </div>
+      </div>
+      <div class="loan-card">
+        <div class="loan-label">Annual Debt Service</div>
+        <div class="loan-value">$967,749</div>
+        <div class="loan-note">$80,646/mo · 3.25% fixed rate</div>
+      </div>
+      <div class="loan-card">
+        <div class="loan-label">Maturity</div>
+        <div class="loan-value amber">Sep 15, 2027</div>
+        <div class="loan-note">Refi flag: Feb 1, 2027 · Target close: May 2027</div>
+      </div>
+    </div>
+
+  </main>
+  </div><!-- /tab-financial -->
+
+  <!-- STR PERFORMANCE TAB -->
+  <div id="tab-str" class="tab-panel">
+  <main>
+
+    <!-- STR KPI CARDS -->
+    <div class="section-label">Latest Week — Mar 15, 2026 vs Comp Set</div>
+    <div class="str-kpi-grid" id="str-kpi-grid"><!-- js --></div>
+
+    <!-- TRAILING 12 MO -->
+    <div class="section-label">Trailing 12 Months (Apr 2025 – Mar 2026)</div>
+    <div class="str-kpi-grid" id="str-t12-grid"><!-- js --></div>
+
+    <!-- REVPAR TREND -->
+    <div class="section-label">RevPAR Trend — Weekly (Jan 2024 – Mar 2026)</div>
+    <div class="chart-grid">
+      <div class="chart-card full">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">RevPAR — Property vs Comp Set</div>
+            <div class="chart-sub">Weekly revenue per available room · 93 data points</div>
+          </div>
+          <span class="chart-tag">STAR Data</span>
+        </div>
+        <div class="chart-wrap tall">
+          <canvas id="strRevparChart"></canvas>
+        </div>
+      </div>
+
+      <!-- RGI TREND -->
+      <div class="chart-card full">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">RevPAR Index (RGI) — Weekly</div>
+            <div class="chart-sub">Property RevPAR ÷ Comp Set RevPAR × 100 · Baseline = 100 (parity)</div>
+          </div>
+          <span class="chart-tag">93 Weeks</span>
+        </div>
+        <div class="chart-wrap tall">
+          <canvas id="strRgiChart"></canvas>
+        </div>
+      </div>
+
+      <!-- OCC & ADR DUAL AXIS -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Occupancy &amp; ADR — Monthly Avg</div>
+            <div class="chart-sub">Property vs comp set · Dual axis</div>
+          </div>
+        </div>
+        <div class="chart-wrap tall">
+          <canvas id="strOccAdrChart"></canvas>
+        </div>
+      </div>
+
+      <!-- YoY RevPAR BAR -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">RevPAR by Month — YoY</div>
+            <div class="chart-sub">2024 vs 2025 vs 2026 YTD</div>
+          </div>
+          <span class="chart-tag">YoY</span>
+        </div>
+        <div class="chart-wrap tall">
+          <canvas id="strYoyChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- BEST / WORST WEEKS -->
+    <div class="section-label">Best &amp; Worst Performing Weeks by RGI</div>
+    <div class="str-best-worst-wrap">
+      <div class="str-bw-grid">
+        <div class="str-bw-section">
+          <div class="str-bw-title gold">🏆 Top 5 Weeks by RGI</div>
+          <div id="str-best-weeks"><!-- js --></div>
+        </div>
+        <div class="str-bw-section">
+          <div class="str-bw-title dim">⚠️ Bottom 5 Weeks by RGI</div>
+          <div id="str-worst-weeks"><!-- js --></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMPETITIVE SUMMARY TABLE -->
+    <div class="section-label">Monthly Performance — Full History</div>
+    <div class="yoy-table-wrap">
+      <div class="yoy-table-header">
+        <div>
+          <div class="chart-title">Monthly STR Summary</div>
+          <div class="chart-sub">All months 2024–2026 · Occ%, ADR, RevPAR, RGI vs comp set</div>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table id="str-monthly-table">
+          <thead>
+            <tr>
+              <th>Period</th>
+              <th>Occ% Prop</th>
+              <th>Occ% Comp</th>
+              <th>MPI</th>
+              <th>ADR Prop</th>
+              <th>ADR Comp</th>
+              <th>ARI</th>
+              <th>RevPAR Prop</th>
+              <th>RevPAR Comp</th>
+              <th>RGI</th>
+            </tr>
+          </thead>
+          <tbody id="str-monthly-tbody"><!-- js --></tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+  </div><!-- /tab-str -->
+
+  <footer>
+    Spring Hill Suites by Marriott — Lakeland, FL · Lakeland Hospitality Group · Confidential
+  </footer>
+</div>
+
+<script>
+// ─── AUTH ───────────────────────────────────────────────────────────────────
+function checkAuth(e) {
+  e.preventDefault();
+  const pw = document.getElementById('pw-input').value.trim();
+  if (pw === 'bfp2026') {
+    document.getElementById('auth-gate').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    initDashboard();
+  } else {
+    const err = document.getElementById('auth-error');
+    err.style.display = 'block';
+    document.getElementById('pw-input').value = '';
+    setTimeout(() => { err.style.display = 'none'; }, 3000);
+  }
+}
+
+// ─── TAB SWITCHING ───────────────────────────────────────────────────────────
+let strChartsBuilt = false;
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  btn.classList.add('active');
+  if (tab === 'str' && !strChartsBuilt) {
+    buildSTRDashboard();
+    strChartsBuilt = true;
+  }
+}
+
+// ─── DATA ────────────────────────────────────────────────────────────────────
+// All monetary values in dollars (already divided from cents)
+// ADR/RevPAR in dollars (divided from cents where stored)
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+const annual = {
+  2023: { rev: 6971203, nop: 1878518, gop: 3414247, dscr: 1.94, nopMargin: 0.269, avgOcc: 0.801 },
+  2024: { rev: 7069412, nop: 1828581, gop: 3398189, dscr: 1.89, nopMargin: 0.259, avgOcc: 0.801 },
+  2025: { rev: 6884571, nop: 1640281, gop: 3197070, dscr: 1.69, nopMargin: 0.238, avgOcc: 0.780 },
+};
+
+// Monthly data for 2024 and 2025
+const monthly = {
+  2024: [
+    { m:1,  rev: 559126, nop:  50491, occ: 0.7672, adr: 160.83, revpar: 123.40 },
+    { m:2,  rev: 703287, nop: 256709, occ: 0.8761, adr: 195.65, revpar: 171.42 },
+    { m:3,  rev: 725257, nop: 280200, occ: 0.8402, adr: 201.54, revpar: 169.34 },
+    { m:4,  rev: 841632, nop: 361683, occ: 0.8315, adr: 238.24, revpar: 198.11 },
+    { m:5,  rev: 548849, nop: 128261, occ: 0.7496, adr: 164.95, revpar: 123.65 },
+    { m:6,  rev: 572662, nop: 150339, occ: 0.7959, adr: 165.56, revpar: 131.77 },
+    { m:7,  rev: 416212, nop:  27570, occ: 0.6806, adr: 140.71, revpar:  95.77 },
+    { m:8,  rev: 436349, nop:  35647, occ: 0.7077, adr: 138.40, revpar:  97.94 },
+    { m:9,  rev: 489491, nop:  92595, occ: 0.8095, adr: 142.15, revpar: 115.07 },
+    { m:10, rev: 671170, nop: 222852, occ: 0.9077, adr: 165.97, revpar: 150.65 },
+    { m:11, rev: 542839, nop: 141312, occ: 0.8395, adr: 152.62, revpar: 128.12 },
+    { m:12, rev: 562538, nop:  80922, occ: 0.8040, adr: 154.68, revpar: 124.36 },
+  ],
+  2025: [
+    { m:1,  rev: 622738, nop: 116589, occ: 0.8258, adr: 168.17, revpar: 138.88 },
+    { m:2,  rev: 751384, nop: 317523, occ: 0.9173, adr: 205.77, revpar: 188.75 },
+    { m:3,  rev: 846744, nop: 354299, occ: 0.9270, adr: 210.88, revpar: 195.49 },
+    { m:4,  rev: 748151, nop: 276035, occ: 0.7969, adr: 223.85, revpar: 178.39 },
+    { m:5,  rev: 620932, nop: 158923, occ: 0.7993, adr: 165.44, revpar: 132.23 },
+    { m:6,  rev: 510305, nop:  24272, occ: 0.7623, adr: 158.01, revpar: 120.45 },
+    { m:7,  rev: 396685, nop:   7702, occ: 0.6663, adr: 137.55, revpar:  91.64 },
+    { m:8,  rev: 489670, nop:  49190, occ: 0.7856, adr: 144.00, revpar: 113.13 },
+    { m:9,  rev: 404814, nop:    480, occ: 0.6997, adr: 132.66, revpar:  92.83 },
+    { m:10, rev: 545593, nop:  81469, occ: 0.8055, adr: 152.04, revpar: 122.47 },
+    { m:11, rev: 532780, nop: 158820, occ: 0.7369, adr: 165.45, revpar: 121.92 },
+    { m:12, rev: 414775, nop:  94979, occ: 0.6429, adr: 145.74, revpar:  93.70 },
+  ],
+  2023: [
+    { m:1,  rev: 544890, nop:  83592, occ: 0.8035, adr: 150.21, revpar: 120.69 },
+    { m:2,  rev: 688385, nop: 239907, occ: 0.8956, adr: 197.21, revpar: 176.63 },
+    { m:3,  rev: 940484, nop: 479063, occ: 0.9136, adr: 248.99, revpar: 227.51 },
+    { m:4,  rev: 623940, nop: 194097, occ: 0.7733, adr: 191.20, revpar: 147.86 },
+    { m:5,  rev: 528373, nop: 108895, occ: 0.7439, adr: 158.91, revpar: 118.22 },
+    { m:6,  rev: 538036, nop: 129402, occ: 0.8359, adr: 154.38, revpar: 129.04 },
+    { m:7,  rev: 488821, nop:  91627, occ: 0.7757, adr: 140.54, revpar: 109.02 },
+    { m:8,  rev: 465115, nop:  45392, occ: 0.7759, adr: 133.08, revpar: 103.26 },
+    { m:9,  rev: 568622, nop: 158464, occ: 0.7885, adr: 167.33, revpar: 131.95 },
+    { m:10, rev: 568622, nop: 158464, occ: 0.7886, adr: 162.17, revpar: 127.89 },
+    { m:11, rev: 535669, nop: 142205, occ: 0.7692, adr: 153.62, revpar: 118.17 },
+    { m:12, rev: 480246, nop:  47410, occ: 0.7491, adr: 144.41, revpar: 108.18 },
+  ],
+};
+
+const data2026 = {
+  rev: 1389498, nop: 505672,
+  occ: 0.860, adr: ((17029+21435)/2)/100,
+};
+
+// ─── CHART DEFAULTS ──────────────────────────────────────────────────────────
+const AMBER = '#f59e0b';
+const AMBER2 = 'rgba(245,158,11,0.7)';
+const AMBER3 = 'rgba(245,158,11,0.3)';
+const GREEN = '#22c55e';
+const RED = '#ef4444';
+const BLUE = '#60a5fa';
+const PURPLE = '#a78bfa';
+
+Chart.defaults.color = '#6b7280';
+Chart.defaults.borderColor = '#2a2a30';
+Chart.defaults.font.family = "'Inter', system-ui, sans-serif";
+Chart.defaults.font.size = 11;
+
+function fmt$(n) {
+  if (n >= 1e6) return '$' + (n/1e6).toFixed(2) + 'M';
+  if (n >= 1e3) return '$' + (n/1e3).toFixed(0) + 'K';
+  return '$' + n.toFixed(0);
+}
+function pct(n) { return (n*100).toFixed(1) + '%'; }
+function fmtDelta(n, prefix='') {
+  const sign = n >= 0 ? '+' : '';
+  return prefix + sign + n.toFixed(1) + '%';
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+function initDashboard() {
+  buildKPIs();
+  build2026KPIs();
+  buildRevNopChart();
+  buildDSCRChart();
+  buildMarginChart();
+  buildOccChart();
+  buildADRChart();
+  buildYoYTable();
+}
+
+// ─── KPIs (2025) ─────────────────────────────────────────────────────────────
+function buildKPIs() {
+  const a25 = annual[2025];
+  const a24 = annual[2024];
+
+  const revChg = (a25.rev / a24.rev - 1) * 100;
+  const nopChg = (a25.nop / a24.nop - 1) * 100;
+
+  const cards = [
+    {
+      label: 'Total Revenue',
+      value: fmt$(a25.rev),
+      delta: fmtDelta(revChg),
+      deltaDir: revChg >= 0 ? 'up' : 'down',
+      sub: 'vs 2024 · YoY',
+    },
+    {
+      label: 'Net Operating Profit',
+      value: fmt$(a25.nop),
+      delta: fmtDelta(nopChg),
+      deltaDir: nopChg >= 0 ? 'up' : 'down',
+      sub: 'vs 2024 · YoY',
+    },
+    {
+      label: 'NOP Margin',
+      value: pct(a25.nopMargin),
+      delta: fmtDelta((a25.nopMargin - a24.nopMargin) * 100, ''),
+      deltaClass: a25.nopMargin >= a24.nopMargin ? 'up' : 'down',
+      sub: '2024 was 25.9%',
+      deltaDir: a25.nopMargin >= a24.nopMargin ? 'up' : 'down',
+    },
+    {
+      label: 'Avg Occupancy',
+      value: pct(a25.avgOcc),
+      delta: fmtDelta((a25.avgOcc - a24.avgOcc) * 100),
+      deltaDir: a25.avgOcc >= a24.avgOcc ? 'up' : 'down',
+      sub: '2024 was 80.1%',
+    },
+  ];
+
+  const grid = document.getElementById('kpi-grid');
+  grid.innerHTML = cards.map(c => `
+    <div class="kpi-card">
+      <div class="kpi-label">${c.label}</div>
+      <div class="kpi-value">${c.value}</div>
+      <div class="kpi-delta ${c.deltaDir}">${c.deltaDir === 'up' ? '▲' : '▼'} ${c.delta}</div>
+      <div class="kpi-sub">${c.sub}</div>
+    </div>
+  `).join('');
+}
+
+// ─── 2026 KPIs ───────────────────────────────────────────────────────────────
+function build2026KPIs() {
+  // Jan+Feb 2025 for comparison
+  const rev25 = monthly[2025][0].rev + monthly[2025][1].rev;
+  const nop25 = monthly[2025][0].nop + monthly[2025][1].nop;
+  const occ25 = (monthly[2025][0].occ + monthly[2025][1].occ) / 2;
+
+  const revChg = (data2026.rev / rev25 - 1) * 100;
+  const nopChg = (data2026.nop / nop25 - 1) * 100;
+  const occChg = (data2026.occ - occ25) * 100;
+
+  const cards = [
+    {
+      label: '2026 Revenue (Jan–Feb)',
+      value: fmt$(data2026.rev),
+      delta: fmtDelta(revChg),
+      deltaDir: revChg >= 0 ? 'up' : 'down',
+      sub: 'vs 2025 Jan–Feb',
+    },
+    {
+      label: '2026 NOP (Jan–Feb)',
+      value: fmt$(data2026.nop),
+      delta: fmtDelta(nopChg),
+      deltaDir: nopChg >= 0 ? 'up' : 'down',
+      sub: 'vs 2025 Jan–Feb · +16.5%',
+      amber: true,
+    },
+    {
+      label: '2026 Avg Occupancy',
+      value: pct(data2026.occ),
+      delta: fmtDelta(occChg),
+      deltaDir: occChg >= 0 ? 'up' : 'down',
+      sub: 'vs 2025 Jan–Feb',
+      amber: true,
+    },
+    {
+      label: '2026 Avg ADR',
+      value: '$' + data2026.adr.toFixed(2),
+      delta: '',
+      deltaDir: 'neutral',
+      sub: 'Jan–Feb average',
+    },
+  ];
+
+  const grid = document.getElementById('kpi-2026');
+  grid.innerHTML = cards.map(c => `
+    <div class="kpi-card">
+      <div class="kpi-label">${c.label}</div>
+      <div class="kpi-value ${c.amber ? 'amber' : ''}">${c.value}</div>
+      ${c.delta ? `<div class="kpi-delta ${c.deltaDir}">${c.deltaDir === 'up' ? '▲' : (c.deltaDir === 'down' ? '▼' : '')} ${c.delta}</div>` : ''}
+      <div class="kpi-sub">${c.sub}</div>
+    </div>
+  `).join('');
+}
+
+// ─── REV + NOP CHART ─────────────────────────────────────────────────────────
+function buildRevNopChart() {
+  const ctx = document.getElementById('revNopChart').getContext('2d');
+  const labels = ['2023', '2024', '2025'];
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Total Revenue',
+          data: [annual[2023].rev, annual[2024].rev, annual[2025].rev],
+          backgroundColor: 'rgba(245,158,11,0.25)',
+          borderColor: AMBER,
+          borderWidth: 2,
+          borderRadius: 6,
+        },
+        {
+          label: 'Net Operating Profit',
+          data: [annual[2023].nop, annual[2024].nop, annual[2025].nop],
+          backgroundColor: 'rgba(34,197,94,0.25)',
+          borderColor: GREEN,
+          borderWidth: 2,
+          borderRadius: 6,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: '#9ca3af', boxWidth: 12, padding: 16 } },
+        tooltip: {
+          callbacks: {
+            label: ctx => ' ' + ctx.dataset.label + ': ' + fmt$(ctx.raw),
+          },
+        },
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280' } },
+        y: {
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: { color: '#6b7280', callback: v => fmt$(v) },
+        },
+      },
+    },
+  });
+}
+
+// ─── DSCR CHART ──────────────────────────────────────────────────────────────
+function buildDSCRChart() {
+  const ctx = document.getElementById('dscrChart').getContext('2d');
+  const labels = ['2023', '2024', '2025'];
+  const vals = [1.94, 1.89, 1.69];
+  const colors = vals.map(v => v >= 2.0 ? GREEN : v >= 1.5 ? AMBER : RED);
+
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'DSCR',
+        data: vals,
+        backgroundColor: colors.map(c => c + '44'),
+        borderColor: colors,
+        borderWidth: 2,
+        borderRadius: 6,
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ' DSCR: ' + ctx.raw.toFixed(2) + '×' } },
+        annotation: {},
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280' } },
+        y: {
+          min: 0, max: 2.5,
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: { color: '#6b7280', callback: v => v.toFixed(1) + '×' },
+        },
+      },
+    },
+    plugins: [{
+      id: 'threshold',
+      afterDraw(chart) {
+        const { ctx, chartArea: { left, right }, scales: { y } } = chart;
+        const y1 = y.getPixelForValue(1.0);
+        ctx.save();
+        ctx.strokeStyle = RED;
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4,4]);
+        ctx.beginPath(); ctx.moveTo(left, y1); ctx.lineTo(right, y1); ctx.stroke();
+        ctx.fillStyle = RED;
+        ctx.font = '10px Inter, system-ui';
+        ctx.fillText('1.0× min', right - 52, y1 - 4);
+        const y2 = y.getPixelForValue(1.25);
+        ctx.strokeStyle = AMBER;
+        ctx.beginPath(); ctx.moveTo(left, y2); ctx.lineTo(right, y2); ctx.stroke();
+        ctx.fillStyle = AMBER;
+        ctx.fillText('1.25× threshold', right - 84, y2 - 4);
+        ctx.restore();
+      },
+    }],
+  });
+}
+
+// ─── MARGIN CHART ────────────────────────────────────────────────────────────
+function buildMarginChart() {
+  const ctx = document.getElementById('marginChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['2023', '2024', '2025'],
+      datasets: [
+        {
+          label: 'NOP Margin',
+          data: [26.9, 25.9, 23.8],
+          borderColor: AMBER,
+          backgroundColor: AMBER3,
+          borderWidth: 2,
+          pointBackgroundColor: AMBER,
+          fill: true,
+          tension: 0.3,
+        },
+        {
+          label: 'GOP Margin',
+          data: [
+            (annual[2023].gop/annual[2023].rev*100).toFixed(1),
+            (annual[2024].gop/annual[2024].rev*100).toFixed(1),
+            (annual[2025].gop/annual[2025].rev*100).toFixed(1),
+          ],
+          borderColor: BLUE,
+          backgroundColor: 'rgba(96,165,250,0.1)',
+          borderWidth: 2,
+          pointBackgroundColor: BLUE,
+          fill: true,
+          tension: 0.3,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: '#9ca3af', boxWidth: 12, padding: 12 } },
+        tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + ctx.raw + '%' } },
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280' } },
+        y: {
+          min: 15, max: 55,
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: { color: '#6b7280', callback: v => v + '%' },
+        },
+      },
+    },
+  });
+}
+
+// ─── OCCUPANCY CHART ─────────────────────────────────────────────────────────
+function buildOccChart() {
+  const ctx = document.getElementById('occChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: MONTHS,
+      datasets: [
+        {
+          label: '2023',
+          data: monthly[2023].map(d => (d.occ * 100).toFixed(1)),
+          borderColor: 'rgba(96,165,250,0.7)',
+          backgroundColor: 'transparent',
+          borderWidth: 1.5,
+          pointRadius: 2,
+          tension: 0.3,
+        },
+        {
+          label: '2024',
+          data: monthly[2024].map(d => (d.occ * 100).toFixed(1)),
+          borderColor: 'rgba(167,139,250,0.8)',
+          backgroundColor: 'transparent',
+          borderWidth: 1.5,
+          pointRadius: 2,
+          tension: 0.3,
+        },
+        {
+          label: '2025',
+          data: monthly[2025].map(d => (d.occ * 100).toFixed(1)),
+          borderColor: AMBER,
+          backgroundColor: AMBER3,
+          borderWidth: 2,
+          pointRadius: 3,
+          fill: true,
+          tension: 0.3,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: '#9ca3af', boxWidth: 10, padding: 12 } },
+        tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + ctx.raw + '%' } },
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280' } },
+        y: {
+          min: 50, max: 100,
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: { color: '#6b7280', callback: v => v + '%' },
+        },
+      },
+    },
+  });
+}
+
+// ─── ADR / REVPAR CHART ──────────────────────────────────────────────────────
+function buildADRChart() {
+  const ctx = document.getElementById('adrChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: MONTHS,
+      datasets: [
+        {
+          label: '2024 ADR',
+          data: monthly[2024].map(d => d.adr.toFixed(2)),
+          borderColor: 'rgba(167,139,250,0.7)',
+          backgroundColor: 'transparent',
+          borderWidth: 1.5,
+          pointRadius: 2,
+          tension: 0.3,
+        },
+        {
+          label: '2025 ADR',
+          data: monthly[2025].map(d => d.adr.toFixed(2)),
+          borderColor: AMBER,
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          pointRadius: 3,
+          tension: 0.3,
+        },
+        {
+          label: '2025 RevPAR',
+          data: monthly[2025].map(d => d.revpar.toFixed(2)),
+          borderColor: GREEN,
+          backgroundColor: 'rgba(34,197,94,0.1)',
+          borderWidth: 1.5,
+          borderDash: [4,3],
+          pointRadius: 2,
+          fill: true,
+          tension: 0.3,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: '#9ca3af', boxWidth: 10, padding: 12 } },
+        tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ': $' + ctx.raw } },
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280' } },
+        y: {
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: { color: '#6b7280', callback: v => '$' + v },
+        },
+      },
+    },
+  });
+}
+
+// ─── YoY TABLE ───────────────────────────────────────────────────────────────
+function buildYoYTable() {
+  const tbody = document.getElementById('yoy-tbody');
+  const rows = MONTHS.map((m, i) => {
+    const d24 = monthly[2024][i];
+    const d25 = monthly[2025][i];
+    const revDelta = d25.rev - d24.rev;
+    const revDeltaPct = (revDelta / d24.rev) * 100;
+    const nopDeltaPct = d24.nop > 0 ? ((d25.nop - d24.nop) / d24.nop) * 100 : null;
+    const revClass = revDeltaPct >= 0 ? 'pos' : 'neg';
+    const nopClass = nopDeltaPct === null ? 'neu' : (nopDeltaPct >= 0 ? 'pos' : 'neg');
+
+    return `<tr>
+      <td>${m}</td>
+      <td>${fmt$(d24.rev)}</td>
+      <td>${fmt$(d25.rev)}</td>
+      <td class="${revClass}">${revDelta >= 0 ? '+' : ''}${fmt$(revDelta)}</td>
+      <td class="${revClass}">${revDeltaPct >= 0 ? '+' : ''}${revDeltaPct.toFixed(1)}%</td>
+      <td>${fmt$(d24.nop)}</td>
+      <td>${fmt$(d25.nop)}</td>
+      <td class="${nopClass}">${nopDeltaPct !== null ? (nopDeltaPct >= 0 ? '+' : '') + nopDeltaPct.toFixed(1) + '%' : '—'}</td>
+    </tr>`;
+  });
+  tbody.innerHTML = rows.join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ─── STR PERFORMANCE DATA & CHARTS ──────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// Weekly STAR data — 93 weeks, Jan 2024–Mar 2026
+const strWeekly = [
+  { w:'2024-01-07', yr:2024, mo:'Jan', occ:79.4, occC:72.4, mpi:109.6, adr:162.71, adrC:147.62, ari:110.2, revpar:129.14, revparC:106.88, rgi:120.8 },
+  { w:'2024-01-14', yr:2024, mo:'Jan', occ:81.4, occC:77.6, mpi:104.9, adr:160.68, adrC:148.28, ari:108.4, revpar:130.80, revparC:115.05, rgi:113.7 },
+  { w:'2024-01-21', yr:2024, mo:'Jan', occ:87.9, occC:83.2, mpi:105.6, adr:181.39, adrC:157.64, ari:115.1, revpar:159.38, revparC:131.15, rgi:121.5 },
+  { w:'2024-01-28', yr:2024, mo:'Jan', occ:85.4, occC:87.0, mpi:98.2,  adr:201.98, adrC:175.33, ari:115.2, revpar:172.44, revparC:152.47, rgi:113.1 },
+  { w:'2024-02-04', yr:2024, mo:'Feb', occ:83.7, occC:75.7, mpi:110.6, adr:193.84, adrC:161.76, ari:119.8, revpar:162.19, revparC:122.39, rgi:132.5 },
+  { w:'2024-02-11', yr:2024, mo:'Feb', occ:79.6, occC:82.7, mpi:96.3,  adr:191.48, adrC:183.04, ari:104.6, revpar:152.41, revparC:151.29, rgi:100.7 },
+  { w:'2024-02-18', yr:2024, mo:'Feb', occ:90.2, occC:91.3, mpi:98.8,  adr:207.88, adrC:191.99, ari:108.3, revpar:187.61, revparC:175.36, rgi:107.0 },
+  { w:'2024-02-25', yr:2024, mo:'Feb', occ:96.8, occC:91.2, mpi:106.2, adr:217.30, adrC:195.10, ari:111.4, revpar:210.40, revparC:177.87, rgi:118.3 },
+  { w:'2024-03-03', yr:2024, mo:'Mar', occ:82.2, occC:85.5, mpi:96.1,  adr:229.02, adrC:205.66, ari:111.4, revpar:188.25, revparC:175.88, rgi:107.0 },
+  { w:'2024-03-10', yr:2024, mo:'Mar', occ:91.5, occC:91.5, mpi:100.0, adr:216.80, adrC:199.51, ari:108.7, revpar:198.37, revparC:182.53, rgi:108.7 },
+  { w:'2024-03-17', yr:2024, mo:'Mar', occ:88.7, occC:83.9, mpi:105.7, adr:204.77, adrC:187.66, ari:109.1, revpar:181.55, revparC:157.36, rgi:115.4 },
+  { w:'2024-03-24', yr:2024, mo:'Mar', occ:75.8, occC:65.8, mpi:115.2, adr:168.65, adrC:145.38, ari:116.0, revpar:127.92, revparC:95.74,  rgi:133.6 },
+  { w:'2024-03-31', yr:2024, mo:'Mar', occ:80.2, occC:79.1, mpi:101.4, adr:239.35, adrC:202.99, ari:117.9, revpar:191.86, revparC:160.54, rgi:119.5 },
+  { w:'2024-04-07', yr:2024, mo:'Apr', occ:77.5, occC:91.8, mpi:84.5,  adr:362.11, adrC:305.51, ari:118.5, revpar:280.82, revparC:280.55, rgi:100.1 },
+  { w:'2024-04-14', yr:2024, mo:'Apr', occ:88.4, occC:75.8, mpi:116.7, adr:224.37, adrC:187.91, ari:119.4, revpar:198.42, revparC:142.37, rgi:139.4 },
+  { w:'2024-04-21', yr:2024, mo:'Apr', occ:83.7, occC:75.3, mpi:111.2, adr:191.89, adrC:159.69, ari:120.2, revpar:160.56, revparC:120.19, rgi:133.6 },
+  { w:'2024-04-28', yr:2024, mo:'Apr', occ:76.1, occC:66.8, mpi:113.9, adr:178.61, adrC:147.56, ari:121.0, revpar:135.88, revparC:98.54,  rgi:137.9 },
+  { w:'2024-05-05', yr:2024, mo:'May', occ:73.9, occC:65.7, mpi:112.5, adr:185.95, adrC:150.16, ari:123.8, revpar:137.46, revparC:98.66,  rgi:139.3 },
+  { w:'2024-05-12', yr:2024, mo:'May', occ:76.2, occC:60.2, mpi:126.5, adr:160.77, adrC:142.55, ari:112.8, revpar:122.49, revparC:85.85,  rgi:142.7 },
+  { w:'2024-05-19', yr:2024, mo:'May', occ:76.1, occC:64.6, mpi:117.8, adr:160.58, adrC:133.99, ari:119.8, revpar:122.17, revparC:86.53,  rgi:141.2 },
+  { w:'2024-05-26', yr:2024, mo:'May', occ:73.0, occC:54.9, mpi:132.9, adr:159.12, adrC:142.75, ari:111.5, revpar:116.18, revparC:78.43,  rgi:148.1 },
+  { w:'2024-06-02', yr:2024, mo:'Jun', occ:80.5, occC:77.5, mpi:103.8, adr:179.21, adrC:147.41, ari:121.6, revpar:144.26, revparC:114.31, rgi:126.2 },
+  { w:'2024-06-09', yr:2024, mo:'Jun', occ:69.5, occC:65.7, mpi:105.8, adr:151.84, adrC:135.15, ari:112.3, revpar:105.53, revparC:88.77,  rgi:118.9 },
+  { w:'2024-06-16', yr:2024, mo:'Jun', occ:83.0, occC:83.6, mpi:99.3,  adr:173.87, adrC:153.57, ari:113.2, revpar:144.30, revparC:128.36, rgi:112.4 },
+  { w:'2024-06-23', yr:2024, mo:'Jun', occ:93.1, occC:72.2, mpi:128.9, adr:177.96, adrC:141.42, ari:125.8, revpar:165.65, revparC:102.16, rgi:162.2 },
+  { w:'2024-07-07', yr:2024, mo:'Jul', occ:79.2, occC:62.5, mpi:126.8, adr:148.33, adrC:123.96, ari:119.7, revpar:117.56, revparC:77.51,  rgi:151.7 },
+  { w:'2024-07-14', yr:2024, mo:'Jul', occ:81.9, occC:66.6, mpi:122.9, adr:148.50, adrC:125.77, ari:118.1, revpar:121.56, revparC:83.78,  rgi:145.1 },
+  { w:'2024-07-21', yr:2024, mo:'Jul', occ:71.8, occC:61.9, mpi:116.0, adr:148.57, adrC:128.30, ari:115.8, revpar:106.63, revparC:79.40,  rgi:134.3 },
+  { w:'2024-07-28', yr:2024, mo:'Jul', occ:57.0, occC:49.5, mpi:115.2, adr:134.52, adrC:123.11, ari:109.3, revpar:76.72,  revparC:60.95,  rgi:125.9 },
+  { w:'2024-08-04', yr:2024, mo:'Aug', occ:58.8, occC:52.5, mpi:112.0, adr:140.33, adrC:118.51, ari:118.4, revpar:82.58,  revparC:62.27,  rgi:132.6 },
+  { w:'2024-08-11', yr:2024, mo:'Aug', occ:85.6, occC:67.9, mpi:126.0, adr:158.86, adrC:126.45, ari:125.6, revpar:135.98, revparC:85.90,  rgi:158.3 },
+  { w:'2024-08-18', yr:2024, mo:'Aug', occ:73.6, occC:52.5, mpi:140.2, adr:137.72, adrC:119.68, ari:115.1, revpar:101.34, revparC:62.83,  rgi:161.3 },
+  { w:'2024-09-01', yr:2024, mo:'Sep', occ:73.5, occC:44.9, mpi:163.5, adr:133.44, adrC:116.67, ari:114.4, revpar:98.04,  revparC:52.43,  rgi:187.0 },
+  { w:'2024-09-08', yr:2024, mo:'Sep', occ:77.4, occC:65.3, mpi:118.7, adr:150.80, adrC:125.34, ari:120.3, revpar:116.77, revparC:81.80,  rgi:142.7 },
+  { w:'2024-09-15', yr:2024, mo:'Sep', occ:86.4, occC:67.1, mpi:128.8, adr:152.26, adrC:125.76, ari:121.1, revpar:131.55, revparC:84.39,  rgi:155.9 },
+  { w:'2024-09-22', yr:2024, mo:'Sep', occ:85.0, occC:78.2, mpi:108.8, adr:150.07, adrC:132.86, ari:113.0, revpar:127.61, revparC:103.87, rgi:122.9 },
+  { w:'2024-09-29', yr:2024, mo:'Sep', occ:94.1, occC:85.4, mpi:110.2, adr:160.90, adrC:140.35, ari:114.6, revpar:151.41, revparC:119.89, rgi:126.3 },
+  { w:'2024-10-06', yr:2024, mo:'Oct', occ:78.9, occC:76.3, mpi:103.5, adr:166.34, adrC:152.61, ari:109.0, revpar:131.26, revparC:116.40, rgi:112.8 },
+  { w:'2024-10-13', yr:2024, mo:'Oct', occ:98.6, occC:90.0, mpi:109.5, adr:179.35, adrC:160.90, ari:111.5, revpar:176.91, revparC:144.90, rgi:122.1 },
+  { w:'2024-10-20', yr:2024, mo:'Oct', occ:96.4, occC:86.3, mpi:111.6, adr:181.01, adrC:158.20, ari:114.4, revpar:174.44, revparC:136.57, rgi:127.7 },
+  { w:'2024-10-27', yr:2024, mo:'Oct', occ:81.1, occC:81.2, mpi:99.8,  adr:156.11, adrC:143.82, ari:108.5, revpar:126.58, revparC:116.80, rgi:108.4 },
+  { w:'2024-11-10', yr:2024, mo:'Nov', occ:93.9, occC:89.7, mpi:104.6, adr:158.89, adrC:144.30, ari:110.1, revpar:149.17, revparC:129.46, rgi:115.2 },
+  { w:'2024-11-17', yr:2024, mo:'Nov', occ:90.6, occC:82.3, mpi:110.0, adr:157.46, adrC:140.92, ari:111.7, revpar:142.64, revparC:116.03, rgi:122.9 },
+  { w:'2024-11-24', yr:2024, mo:'Nov', occ:59.3, occC:58.2, mpi:101.8, adr:125.01, adrC:120.46, ari:103.8, revpar:74.13,  revparC:70.16,  rgi:105.7 },
+  { w:'2024-12-01', yr:2024, mo:'Dec', occ:87.1, occC:86.8, mpi:100.3, adr:180.91, adrC:149.64, ari:120.9, revpar:157.52, revparC:129.97, rgi:121.2 },
+  { w:'2024-12-08', yr:2024, mo:'Dec', occ:89.1, occC:90.0, mpi:99.0,  adr:195.44, adrC:158.15, ari:123.6, revpar:174.17, revparC:142.37, rgi:122.3 },
+  { w:'2024-12-15', yr:2024, mo:'Dec', occ:72.1, occC:70.4, mpi:102.5, adr:132.31, adrC:131.79, ari:100.4, revpar:95.41,  revparC:92.75,  rgi:102.9 },
+  { w:'2024-12-29', yr:2024, mo:'Dec', occ:75.3, occC:55.8, mpi:134.9, adr:126.19, adrC:123.04, ari:102.6, revpar:95.00,  revparC:68.68,  rgi:138.3 },
+  { w:'2025-01-05', yr:2025, mo:'Jan', occ:72.8, occC:73.4, mpi:99.2,  adr:155.50, adrC:143.06, ari:108.7, revpar:113.18, revparC:104.99, rgi:107.8 },
+  { w:'2025-01-19', yr:2025, mo:'Jan', occ:87.1, occC:88.3, mpi:98.6,  adr:181.15, adrC:163.41, ari:110.9, revpar:157.74, revparC:144.26, rgi:109.3 },
+  { w:'2025-02-02', yr:2025, mo:'Feb', occ:87.9, occC:83.5, mpi:105.2, adr:211.67, adrC:180.04, ari:117.6, revpar:185.99, revparC:150.36, rgi:123.7 },
+  { w:'2025-02-09', yr:2025, mo:'Feb', occ:93.8, occC:88.1, mpi:106.4, adr:206.26, adrC:196.25, ari:105.1, revpar:193.40, revparC:172.87, rgi:111.9 },
+  { w:'2025-02-16', yr:2025, mo:'Feb', occ:94.3, occC:91.1, mpi:103.5, adr:217.53, adrC:201.89, ari:107.7, revpar:205.20, revparC:184.02, rgi:111.5 },
+  { w:'2025-03-02', yr:2025, mo:'Mar', occ:91.2, occC:90.7, mpi:100.5, adr:223.00, adrC:214.49, ari:104.0, revpar:203.28, revparC:194.60, rgi:104.5 },
+  { w:'2025-03-09', yr:2025, mo:'Mar', occ:96.8, occC:92.0, mpi:105.2, adr:214.21, adrC:199.81, ari:107.2, revpar:207.41, revparC:183.88, rgi:112.8 },
+  { w:'2025-03-30', yr:2025, mo:'Mar', occ:89.2, occC:91.0, mpi:98.0,  adr:363.39, adrC:309.50, ari:117.4, revpar:324.25, revparC:281.71, rgi:115.1 },
+  { w:'2025-04-06', yr:2025, mo:'Apr', occ:82.1, occC:80.9, mpi:101.4, adr:222.22, adrC:181.47, ari:122.5, revpar:182.41, revparC:146.84, rgi:124.2 },
+  { w:'2025-04-13', yr:2025, mo:'Apr', occ:65.8, occC:56.1, mpi:117.3, adr:166.49, adrC:131.36, ari:126.7, revpar:109.48, revparC:73.65,  rgi:148.7 },
+  { w:'2025-04-20', yr:2025, mo:'Apr', occ:81.9, occC:74.9, mpi:109.2, adr:183.67, adrC:160.54, ari:114.4, revpar:150.35, revparC:120.32, rgi:125.0 },
+  { w:'2025-05-11', yr:2025, mo:'May', occ:84.2, occC:77.4, mpi:108.9, adr:174.46, adrC:140.61, ari:124.1, revpar:146.97, revparC:108.77, rgi:135.1 },
+  { w:'2025-05-18', yr:2025, mo:'May', occ:82.5, occC:69.9, mpi:118.1, adr:155.18, adrC:128.53, ari:120.7, revpar:128.09, revparC:89.86,  rgi:142.5 },
+  { w:'2025-06-01', yr:2025, mo:'Jun', occ:81.5, occC:74.6, mpi:109.3, adr:170.42, adrC:143.88, ari:118.4, revpar:138.93, revparC:107.35, rgi:129.4 },
+  { w:'2025-06-08', yr:2025, mo:'Jun', occ:70.0, occC:61.0, mpi:114.7, adr:150.22, adrC:124.00, ari:121.1, revpar:105.09, revparC:75.62,  rgi:139.0 },
+  { w:'2025-06-15', yr:2025, mo:'Jun', occ:69.5, occC:66.8, mpi:104.0, adr:149.71, adrC:124.52, ari:120.2, revpar:104.05, revparC:83.22,  rgi:125.0 },
+  { w:'2025-06-22', yr:2025, mo:'Jun', occ:90.5, occC:77.4, mpi:116.9, adr:182.27, adrC:132.53, ari:137.5, revpar:164.91, revparC:102.57, rgi:160.8 },
+  { w:'2025-06-29', yr:2025, mo:'Jun', occ:49.4, occC:46.7, mpi:105.9, adr:126.37, adrC:113.20, ari:111.6, revpar:62.47,  revparC:52.86,  rgi:118.2 },
+  { w:'2025-07-06', yr:2025, mo:'Jul', occ:64.0, occC:59.5, mpi:107.5, adr:141.17, adrC:119.52, ari:118.1, revpar:90.27,  revparC:71.07,  rgi:127.0 },
+  { w:'2025-07-13', yr:2025, mo:'Jul', occ:73.7, occC:62.6, mpi:117.7, adr:151.81, adrC:117.32, ari:129.4, revpar:111.88, revparC:73.47,  rgi:152.3 },
+  { w:'2025-07-27', yr:2025, mo:'Jul', occ:71.0, occC:61.7, mpi:115.1, adr:137.90, adrC:115.13, ari:119.8, revpar:97.88,  revparC:71.00,  rgi:137.9 },
+  { w:'2025-08-03', yr:2025, mo:'Aug', occ:75.3, occC:56.6, mpi:132.9, adr:144.68, adrC:116.70, ari:124.0, revpar:108.92, revparC:66.11,  rgi:164.8 },
+  { w:'2025-08-10', yr:2025, mo:'Aug', occ:74.9, occC:57.0, mpi:131.4, adr:136.51, adrC:116.04, ari:117.6, revpar:102.31, revparC:66.19,  rgi:154.6 },
+  { w:'2025-08-31', yr:2025, mo:'Aug', occ:58.4, occC:56.3, mpi:103.7, adr:140.65, adrC:121.66, ari:115.6, revpar:82.13,  revparC:68.48,  rgi:119.9 },
+  { w:'2025-09-07', yr:2025, mo:'Sep', occ:73.9, occC:66.3, mpi:111.5, adr:141.20, adrC:121.67, ari:116.1, revpar:104.38, revparC:80.68,  rgi:129.4 },
+  { w:'2025-09-21', yr:2025, mo:'Sep', occ:78.2, occC:60.5, mpi:129.4, adr:137.86, adrC:122.34, ari:112.7, revpar:107.85, revparC:73.98,  rgi:145.8 },
+  { w:'2025-10-05', yr:2025, mo:'Oct', occ:74.3, occC:63.5, mpi:117.0, adr:150.64, adrC:128.67, ari:117.1, revpar:111.87, revparC:81.65,  rgi:137.0 },
+  { w:'2025-10-12', yr:2025, mo:'Oct', occ:83.9, occC:71.9, mpi:116.7, adr:165.18, adrC:138.71, ari:119.1, revpar:138.59, revparC:99.72,  rgi:139.0 },
+  { w:'2025-10-19', yr:2025, mo:'Oct', occ:89.1, occC:67.7, mpi:131.7, adr:149.81, adrC:126.54, ari:118.4, revpar:133.50, revparC:85.62,  rgi:155.9 },
+  { w:'2025-10-26', yr:2025, mo:'Oct', occ:74.7, occC:68.0, mpi:109.8, adr:170.49, adrC:146.92, ari:116.0, revpar:127.38, revparC:99.98,  rgi:127.4 },
+  { w:'2025-11-02', yr:2025, mo:'Nov', occ:88.1, occC:69.4, mpi:127.0, adr:176.73, adrC:138.28, ari:127.8, revpar:155.70, revparC:95.94,  rgi:162.3 },
+  { w:'2025-11-09', yr:2025, mo:'Nov', occ:83.5, occC:72.6, mpi:115.0, adr:182.57, adrC:138.54, ari:131.8, revpar:152.35, revparC:100.56, rgi:151.5 },
+  { w:'2025-11-16', yr:2025, mo:'Nov', occ:78.7, occC:76.1, mpi:103.4, adr:173.62, adrC:137.56, ari:126.2, revpar:136.62, revparC:104.65, rgi:130.5 },
+  { w:'2025-11-23', yr:2025, mo:'Nov', occ:46.5, occC:48.6, mpi:95.7,  adr:123.66, adrC:113.64, ari:108.8, revpar:57.48,  revparC:55.21,  rgi:104.1 },
+  { w:'2025-11-30', yr:2025, mo:'Nov', occ:70.3, occC:75.6, mpi:92.9,  adr:163.42, adrC:131.68, ari:124.1, revpar:114.87, revparC:99.60,  rgi:115.3 },
+  { w:'2025-12-21', yr:2025, mo:'Dec', occ:49.9, occC:52.6, mpi:94.8,  adr:118.64, adrC:101.08, ari:117.4, revpar:59.19,  revparC:53.21,  rgi:111.2 },
+  { w:'2026-01-04', yr:2026, mo:'Jan', occ:81.8, occC:72.2, mpi:113.2, adr:156.72, adrC:131.73, ari:119.0, revpar:128.12, revparC:95.16,  rgi:134.6 },
+  { w:'2026-01-11', yr:2026, mo:'Jan', occ:85.2, occC:82.7, mpi:102.9, adr:189.36, adrC:153.12, ari:123.7, revpar:161.23, revparC:126.68, rgi:127.3 },
+  { w:'2026-01-18', yr:2026, mo:'Jan', occ:89.5, occC:84.1, mpi:106.3, adr:198.76, adrC:170.99, ari:116.2, revpar:177.80, revparC:143.84, rgi:123.6 },
+  { w:'2026-01-25', yr:2026, mo:'Jan', occ:84.7, occC:71.9, mpi:117.8, adr:184.08, adrC:155.61, ari:118.3, revpar:155.91, revparC:111.87, rgi:139.4 },
+  { w:'2026-02-08', yr:2026, mo:'Feb', occ:84.7, occC:87.0, mpi:97.4,  adr:238.13, adrC:197.86, ari:120.4, revpar:201.68, revparC:172.11, rgi:117.2 },
+  { w:'2026-02-22', yr:2026, mo:'Feb', occ:92.7, occC:90.3, mpi:102.7, adr:235.63, adrC:205.43, ari:114.7, revpar:218.53, revparC:185.48, rgi:117.8 },
+  { w:'2026-03-01', yr:2026, mo:'Mar', occ:95.9, occC:89.3, mpi:107.5, adr:229.79, adrC:202.73, ari:113.3, revpar:220.41, revparC:180.96, rgi:121.8 },
+  { w:'2026-03-08', yr:2026, mo:'Mar', occ:87.3, occC:89.6, mpi:97.4,  adr:224.25, adrC:201.84, ari:111.1, revpar:195.77, revparC:180.85, rgi:108.3 },
+  { w:'2026-03-15', yr:2026, mo:'Mar', occ:95.6, occC:89.9, mpi:106.3, adr:219.38, adrC:188.60, ari:116.3, revpar:209.68, revparC:169.50, rgi:123.7 },
+];
+
+// Monthly STAR data
+const strMonthly = [
+  { p:'2024-01', occ:76.7, occC:74.0, mpi:103.7, adr:165.93, adrC:149.57, ari:110.9, revpar:127.31, revparC:110.68, rgi:115.0 },
+  { p:'2024-02', occ:87.6, occC:84.8, mpi:103.3, adr:202.11, adrC:181.97, ari:111.1, revpar:177.06, revparC:154.36, rgi:114.7 },
+  { p:'2024-03', occ:84.0, occC:81.3, mpi:103.3, adr:208.07, adrC:189.62, ari:109.7, revpar:174.78, revparC:154.21, rgi:113.3 },
+  { p:'2024-04', occ:83.2, occC:79.5, mpi:104.7, adr:245.82, adrC:213.09, ari:115.4, revpar:204.39, revparC:169.30, rgi:120.7 },
+  { p:'2024-05', occ:75.0, occC:62.9, mpi:119.3, adr:170.19, adrC:144.85, ari:117.5, revpar:127.58, revparC:91.04,  rgi:140.1 },
+  { p:'2024-06', occ:79.6, occC:73.0, mpi:109.0, adr:170.79, adrC:144.47, ari:118.2, revpar:135.95, revparC:105.52, rgi:128.8 },
+  { p:'2024-07', occ:68.1, occC:56.5, mpi:120.6, adr:145.10, adrC:124.35, ari:116.7, revpar:98.81,  revparC:70.19,  rgi:140.8 },
+  { p:'2024-08', occ:70.8, occC:54.6, mpi:129.6, adr:142.80, adrC:121.28, ari:117.7, revpar:101.05, revparC:66.24,  rgi:152.6 },
+  { p:'2024-09', occ:83.3, occC:68.2, mpi:122.2, adr:149.49, adrC:128.20, ari:116.6, revpar:125.08, revparC:88.48,  rgi:141.4 },
+  { p:'2024-10', occ:90.8, occC:83.2, mpi:109.2, adr:171.25, adrC:157.24, ari:108.9, revpar:155.47, revparC:130.75, rgi:118.9 },
+  { p:'2024-11', occ:83.9, occC:80.6, mpi:104.1, adr:157.48, adrC:141.22, ari:111.5, revpar:132.19, revparC:113.84, rgi:116.1 },
+  { p:'2024-12', occ:80.4, occC:76.1, mpi:105.7, adr:156.61, adrC:140.12, ari:111.8, revpar:125.90, revparC:106.58, rgi:118.1 },
+  { p:'2025-01', occ:82.6, occC:81.5, mpi:101.3, adr:173.49, adrC:157.31, ari:110.3, revpar:143.29, revparC:128.24, rgi:111.7 },
+  { p:'2025-02', occ:92.0, occC:87.6, mpi:105.0, adr:211.82, adrC:192.73, ari:109.9, revpar:194.86, revparC:169.08, rgi:115.2 },
+  { p:'2025-03', occ:92.7, occC:85.5, mpi:108.5, adr:217.60, adrC:203.25, ari:107.1, revpar:201.72, revparC:173.67, rgi:116.2 },
+  { p:'2025-04', occ:76.6, occC:70.6, mpi:108.4, adr:190.79, adrC:157.79, ari:120.9, revpar:147.41, revparC:113.60, rgi:129.8 },
+  { p:'2025-05', occ:79.9, occC:70.2, mpi:113.9, adr:170.69, adrC:141.08, ari:121.0, revpar:136.43, revparC:99.00,  rgi:137.8 },
+  { p:'2025-06', occ:76.2, occC:68.4, mpi:111.4, adr:163.00, adrC:131.27, ari:124.2, revpar:124.28, revparC:89.83,  rgi:138.3 },
+  { p:'2025-07', occ:66.6, occC:58.1, mpi:114.6, adr:141.94, adrC:117.04, ari:121.3, revpar:94.55,  revparC:68.01,  rgi:139.0 },
+  { p:'2025-08', occ:78.6, occC:65.8, mpi:119.5, adr:148.55, adrC:120.71, ari:123.1, revpar:116.72, revparC:79.39,  rgi:147.0 },
+  { p:'2025-09', occ:70.0, occC:59.2, mpi:118.2, adr:136.88, adrC:120.78, ari:113.3, revpar:95.78,  revparC:71.48,  rgi:134.0 },
+  { p:'2025-10', occ:80.5, occC:67.5, mpi:119.4, adr:156.88, adrC:134.83, ari:116.3, revpar:126.35, revparC:90.97,  rgi:138.9 },
+  { p:'2025-11', occ:73.4, occC:68.5, mpi:107.2, adr:164.00, adrC:131.94, ari:124.3, revpar:123.40, revparC:91.19,  rgi:135.3 },
+  { p:'2025-12', occ:49.9, occC:52.6, mpi:94.8,  adr:118.64, adrC:101.08, ari:117.4, revpar:59.19,  revparC:53.21,  rgi:111.2 },
+  { p:'2026-01', occ:85.3, occC:77.7, mpi:109.7, adr:182.23, adrC:152.86, ari:119.2, revpar:155.76, revparC:119.39, rgi:130.5 },
+  { p:'2026-02', occ:88.7, occC:88.6, mpi:100.1, adr:236.88, adrC:201.65, ari:117.5, revpar:210.11, revparC:178.80, rgi:117.5 },
+  { p:'2026-03', occ:92.9, occC:89.6, mpi:103.7, adr:224.47, adrC:197.72, ari:113.5, revpar:208.62, revparC:177.10, rgi:117.8 },
+];
+
+// YoY RevPAR data
+const strYoY = {
+  months: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+  revpar2024: [127.31,177.06,174.78,204.39,127.58,135.95,98.81,101.05,125.08,155.47,132.19,125.90],
+  revpar2025: [143.29,194.86,201.72,147.41,136.43,124.28,94.55,116.72,95.78,126.35,123.40,59.19],
+  revpar2026: [155.76,210.11,208.62,null,null,null,null,null,null,null,null,null],
+};
+
+// Trailing 12 month summary
+const strT12 = { occ:76.6, occC:69.7, mpiIdx:110.1, adr:169.58, adrC:142.40, ariIdx:119.3, revpar:133.22, revparC:102.66, rgi:131.4 };
+
+// Latest week
+const strLatest = strWeekly[strWeekly.length - 1];
+
+// Best/Worst
+const strBest = [
+  { w:'2024-09-01', occ:73.5, adr:133.44, revpar:98.04,  rgi:187.0 },
+  { w:'2025-08-03', occ:75.3, adr:144.68, revpar:108.92, rgi:164.8 },
+  { w:'2025-11-02', occ:88.1, adr:176.73, revpar:155.70, rgi:162.3 },
+  { w:'2024-06-23', occ:93.1, adr:177.96, revpar:165.65, rgi:162.2 },
+  { w:'2024-08-18', occ:73.6, adr:137.72, revpar:101.34, rgi:161.3 },
+];
+const strWorst = [
+  { w:'2025-03-02', occ:91.2, adr:223.00, revpar:203.28, rgi:104.5 },
+  { w:'2025-11-23', occ:46.5, adr:123.66, revpar:57.48,  rgi:104.1 },
+  { w:'2024-12-15', occ:72.1, adr:132.31, revpar:95.41,  rgi:102.9 },
+  { w:'2024-02-11', occ:79.6, adr:191.48, revpar:152.41, rgi:100.7 },
+  { w:'2024-04-07', occ:77.5, adr:362.11, revpar:280.82, rgi:100.1 },
+];
+
+// ─── BUILD STR DASHBOARD ─────────────────────────────────────────────────────
+function buildSTRDashboard() {
+  buildSTRKPIs();
+  buildSTRT12KPIs();
+  buildSTRRevparChart();
+  buildSTRRgiChart();
+  buildSTROccAdrChart();
+  buildSTRYoyChart();
+  buildSTRBestWorst();
+  buildSTRMonthlyTable();
+}
+
+function buildSTRKPIs() {
+  const lw = strLatest;
+  const cards = [
+    {
+      label: 'Occupancy %',
+      value: lw.occ.toFixed(1) + '%',
+      index: lw.mpi.toFixed(1),
+      indexLabel: 'MPI (Occ Index)',
+      sub: 'Comp: ' + lw.occC.toFixed(1) + '%',
+      above: lw.mpi >= 100,
+    },
+    {
+      label: 'ADR',
+      value: '$' + lw.adr.toFixed(2),
+      index: lw.ari.toFixed(1),
+      indexLabel: 'ARI (ADR Index)',
+      sub: 'Comp: $' + lw.adrC.toFixed(2),
+      above: lw.ari >= 100,
+    },
+    {
+      label: 'RevPAR',
+      value: '$' + lw.revpar.toFixed(2),
+      index: (lw.revpar / lw.revparC * 100).toFixed(1),
+      indexLabel: 'vs Comp Set',
+      sub: 'Comp: $' + lw.revparC.toFixed(2),
+      above: lw.revpar >= lw.revparC,
+    },
+    {
+      label: 'RGI',
+      value: lw.rgi.toFixed(1),
+      index: lw.rgi >= 100 ? '+' + (lw.rgi - 100).toFixed(1) + ' pts above parity' : (lw.rgi - 100).toFixed(1) + ' pts below parity',
+      indexLabel: 'vs 100 baseline',
+      sub: 'Avg all-time: 128.8',
+      above: lw.rgi >= 100,
+      amber: true,
+    },
+  ];
+
+  document.getElementById('str-kpi-grid').innerHTML = cards.map(c => `
+    <div class="str-kpi-card">
+      <div class="str-kpi-label">${c.label}</div>
+      <div class="str-kpi-value${c.amber ? ' amber' : ''}">${c.value}</div>
+      <div class="str-kpi-index ${c.above ? 'above' : 'below'}">${typeof c.index === 'string' && c.index.length > 5 ? c.index : 'Index: ' + c.index} ${c.above ? '▲' : '▼'}</div>
+      <div class="str-kpi-sub">${c.sub} · ${c.indexLabel}</div>
+    </div>
+  `).join('');
+}
+
+function buildSTRT12KPIs() {
+  const d = strT12;
+  const cards = [
+    {
+      label: 'T12 Occupancy',
+      value: d.occ.toFixed(1) + '%',
+      index: d.mpiIdx.toFixed(1),
+      sub: 'Comp: ' + d.occC.toFixed(1) + '%',
+      above: d.mpiIdx >= 100,
+    },
+    {
+      label: 'T12 ADR',
+      value: '$' + d.adr.toFixed(2),
+      index: d.ariIdx.toFixed(1),
+      sub: 'Comp: $' + d.adrC.toFixed(2),
+      above: d.ariIdx >= 100,
+    },
+    {
+      label: 'T12 RevPAR',
+      value: '$' + d.revpar.toFixed(2),
+      index: (d.revpar / d.revparC * 100).toFixed(1),
+      sub: 'Comp: $' + d.revparC.toFixed(2),
+      above: d.revpar >= d.revparC,
+    },
+    {
+      label: 'T12 RGI',
+      value: d.rgi.toFixed(1),
+      index: '+' + (d.rgi - 100).toFixed(1) + ' pts vs parity',
+      sub: 'Apr 2025 – Mar 2026',
+      above: true,
+      amber: true,
+    },
+  ];
+
+  document.getElementById('str-t12-grid').innerHTML = cards.map(c => `
+    <div class="str-kpi-card">
+      <div class="str-kpi-label">${c.label}</div>
+      <div class="str-kpi-value${c.amber ? ' amber' : ''}">${c.value}</div>
+      <div class="str-kpi-index ${c.above ? 'above' : 'below'}">${typeof c.index === 'string' && c.index.length > 5 ? c.index : 'Index: ' + c.index} ${c.above ? '▲' : '▼'}</div>
+      <div class="str-kpi-sub">${c.sub}</div>
+    </div>
+  `).join('');
+}
+
+function buildSTRRevparChart() {
+  const ctx = document.getElementById('strRevparChart').getContext('2d');
+  const labels = strWeekly.map(d => d.w.slice(0,7));
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'SHS RevPAR',
+          data: strWeekly.map(d => d.revpar),
+          borderColor: AMBER,
+          backgroundColor: 'rgba(245,158,11,0.08)',
+          borderWidth: 2,
+          pointRadius: 0,
+          tension: 0.3,
+          fill: true,
+        },
+        {
+          label: 'Comp Set RevPAR',
+          data: strWeekly.map(d => d.revparC),
+          borderColor: BLUE,
+          backgroundColor: 'transparent',
+          borderWidth: 1.5,
+          pointRadius: 0,
+          tension: 0.3,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: '#9ca3af', boxWidth: 10, padding: 12 } },
+        tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ': $' + Number(ctx.raw).toFixed(2) } },
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280', maxTicksLimit: 12 } },
+        y: {
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: { color: '#6b7280', callback: v => '$' + v },
+        },
+      },
+    },
+  });
+}
+
+function buildSTRRgiChart() {
+  const ctx = document.getElementById('strRgiChart').getContext('2d');
+  const labels = strWeekly.map(d => d.w.slice(0,7));
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'RGI',
+          data: strWeekly.map(d => d.rgi),
+          borderColor: AMBER,
+          backgroundColor: 'rgba(245,158,11,0.1)',
+          borderWidth: 2,
+          pointRadius: 0,
+          tension: 0.3,
+          fill: true,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ' RGI: ' + Number(ctx.raw).toFixed(1) } },
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280', maxTicksLimit: 12 } },
+        y: {
+          min: 90, max: 200,
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: { color: '#6b7280' },
+        },
+      },
+    },
+    plugins: [{
+      id: 'rgiBaseline',
+      afterDraw(chart) {
+        const { ctx: c, chartArea: { left, right }, scales: { y } } = chart;
+        const y100 = y.getPixelForValue(100);
+        c.save();
+        c.strokeStyle = 'rgba(239,68,68,0.7)';
+        c.lineWidth = 1.5;
+        c.setLineDash([5,5]);
+        c.beginPath(); c.moveTo(left, y100); c.lineTo(right, y100); c.stroke();
+        c.fillStyle = '#ef4444';
+        c.font = '10px Inter, system-ui';
+        c.fillText('100 = parity', right - 72, y100 - 4);
+        c.restore();
+      },
+    }],
+  });
+}
+
+function buildSTROccAdrChart() {
+  const ctx = document.getElementById('strOccAdrChart').getContext('2d');
+  const labels = strMonthly.map(d => d.p.slice(0,7));
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Occ% Prop',
+          data: strMonthly.map(d => d.occ),
+          backgroundColor: 'rgba(245,158,11,0.4)',
+          borderColor: AMBER,
+          borderWidth: 1,
+          borderRadius: 3,
+          yAxisID: 'yOcc',
+        },
+        {
+          label: 'Occ% Comp',
+          data: strMonthly.map(d => d.occC),
+          backgroundColor: 'rgba(96,165,250,0.25)',
+          borderColor: BLUE,
+          borderWidth: 1,
+          borderRadius: 3,
+          yAxisID: 'yOcc',
+        },
+        {
+          label: 'ADR Prop',
+          data: strMonthly.map(d => d.adr),
+          type: 'line',
+          borderColor: GREEN,
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          pointRadius: 2,
+          tension: 0.3,
+          yAxisID: 'yAdr',
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: '#9ca3af', boxWidth: 10, padding: 10, font: { size: 10 } } },
+        tooltip: { mode: 'index', intersect: false },
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280', maxTicksLimit: 9, font: { size: 9 } } },
+        yOcc: {
+          type: 'linear', position: 'left',
+          min: 40, max: 100,
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: { color: '#6b7280', callback: v => v + '%', font: { size: 10 } },
+        },
+        yAdr: {
+          type: 'linear', position: 'right',
+          min: 80, max: 280,
+          grid: { display: false },
+          ticks: { color: '#6b7280', callback: v => '$' + v, font: { size: 10 } },
+        },
+      },
+    },
+  });
+}
+
+function buildSTRYoyChart() {
+  const ctx = document.getElementById('strYoyChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: strYoY.months,
+      datasets: [
+        {
+          label: '2024',
+          data: strYoY.revpar2024,
+          backgroundColor: 'rgba(96,165,250,0.4)',
+          borderColor: BLUE,
+          borderWidth: 1.5,
+          borderRadius: 4,
+        },
+        {
+          label: '2025',
+          data: strYoY.revpar2025,
+          backgroundColor: 'rgba(167,139,250,0.4)',
+          borderColor: PURPLE,
+          borderWidth: 1.5,
+          borderRadius: 4,
+        },
+        {
+          label: '2026 YTD',
+          data: strYoY.revpar2026,
+          backgroundColor: 'rgba(245,158,11,0.5)',
+          borderColor: AMBER,
+          borderWidth: 1.5,
+          borderRadius: 4,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: '#9ca3af', boxWidth: 10, padding: 10 } },
+        tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ': $' + (ctx.raw ? Number(ctx.raw).toFixed(2) : '—') } },
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280' } },
+        y: {
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: { color: '#6b7280', callback: v => '$' + v },
+        },
+      },
+    },
+  });
+}
+
+function buildSTRBestWorst() {
+  document.getElementById('str-best-weeks').innerHTML = strBest.map(w => `
+    <div class="str-bw-row">
+      <span class="str-bw-week">${w.w}</span>
+      <div class="str-bw-metrics">
+        <span class="str-bw-detail">Occ ${w.occ}% · ADR $${w.adr.toFixed(0)} · RevPAR $${w.revpar.toFixed(0)}</span>
+        <span class="str-bw-rgi-best">RGI ${w.rgi}</span>
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('str-worst-weeks').innerHTML = strWorst.map(w => `
+    <div class="str-bw-row">
+      <span class="str-bw-week">${w.w}</span>
+      <div class="str-bw-metrics">
+        <span class="str-bw-detail">Occ ${w.occ}% · ADR $${w.adr.toFixed(0)} · RevPAR $${w.revpar.toFixed(0)}</span>
+        <span class="str-bw-rgi-worst">RGI ${w.rgi}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function buildSTRMonthlyTable() {
+  const tbody = document.getElementById('str-monthly-tbody');
+  tbody.innerHTML = strMonthly.map(d => {
+    const rgiClass = d.rgi >= 130 ? 'pos' : d.rgi >= 115 ? '' : 'neg';
+    return `<tr>
+      <td>${d.p}</td>
+      <td>${d.occ.toFixed(1)}%</td>
+      <td>${d.occC.toFixed(1)}%</td>
+      <td class="${d.mpi >= 100 ? '' : 'neg'}">${d.mpi.toFixed(1)}</td>
+      <td>$${d.adr.toFixed(2)}</td>
+      <td>$${d.adrC.toFixed(2)}</td>
+      <td class="${d.ari >= 100 ? '' : 'neg'}">${d.ari.toFixed(1)}</td>
+      <td>$${d.revpar.toFixed(2)}</td>
+      <td>$${d.revparC.toFixed(2)}</td>
+      <td class="${rgiClass}">${d.rgi.toFixed(1)}</td>
+    </tr>`;
+  }).join('');
+}
+</script>
+</body>
+</html>

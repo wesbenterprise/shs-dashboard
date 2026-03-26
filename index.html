@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SHS Lakeland — Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="str-data.js"></script>
   <style>
     :root {
       --bg: #0a0a0b;
@@ -23,6 +24,21 @@
       --text-muted: #6b7280;
       --text-dim: #9ca3af;
       --font: 'Inter', system-ui, -apple-system, sans-serif;
+
+      /* Astra color spec */
+      --str-bg-primary: #0f172a;
+      --str-bg-card: #1a1a2e;
+      --str-bg-surface: #1e293b;
+      --str-border: #334155;
+      --str-text-primary: #ffffff;
+      --str-text-secondary: #94a3b8;
+      --str-text-muted: #64748b;
+      --str-accent-blue: #60a5fa;
+      --str-accent-green: #4ade80;
+      --str-accent-red: #f87171;
+      --str-accent-amber: #fbbf24;
+      --str-accent-purple: #c084fc;
+      --str-comp: #94a3b8;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -140,18 +156,11 @@
       align-items: center;
       gap: 20px;
     }
-    .refi-icon {
-      font-size: 32px;
-      flex-shrink: 0;
-    }
+    .refi-icon { font-size: 32px; flex-shrink: 0; }
     .refi-text { flex: 1; }
     .refi-text h3 { font-size: 15px; font-weight: 600; color: var(--amber); margin-bottom: 4px; }
     .refi-text p { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
-    .refi-stats {
-      display: flex;
-      gap: 24px;
-      flex-shrink: 0;
-    }
+    .refi-stats { display: flex; gap: 24px; flex-shrink: 0; }
     .refi-stat { text-align: center; }
     .refi-stat .val { font-size: 18px; font-weight: 700; color: var(--amber); }
     .refi-stat .lbl { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
@@ -191,18 +200,13 @@
     .kpi-label { font-size: 11px; color: var(--text-muted); font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; }
     .kpi-value { font-size: 28px; font-weight: 700; color: var(--text); margin: 8px 0 4px; line-height: 1; }
     .kpi-value.amber { color: var(--amber); }
-    .kpi-delta {
-      font-size: 12px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
+    .kpi-delta { font-size: 12px; display: flex; align-items: center; gap: 4px; }
     .kpi-delta.up { color: var(--green); }
     .kpi-delta.down { color: var(--red); }
     .kpi-delta.neutral { color: var(--text-muted); }
     .kpi-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 
-    /* DSCR CARD — special */
+    /* DSCR CARD */
     .dscr-card {
       grid-column: span 2;
       background: var(--surface);
@@ -213,28 +217,6 @@
       gap: 24px;
       align-items: center;
     }
-    .dscr-gauge-wrap { flex-shrink: 0; text-align: center; }
-    .dscr-track {
-      width: 80px; height: 80px;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      position: relative;
-    }
-    .dscr-number { font-size: 26px; font-weight: 700; }
-    .dscr-label { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
-    .dscr-details { flex: 1; }
-    .dscr-details h4 { font-size: 13px; font-weight: 600; margin-bottom: 10px; }
-    .dscr-trend {
-      display: flex;
-      gap: 16px;
-    }
-    .dscr-year { text-align: center; }
-    .dscr-year .yr { font-size: 10px; color: var(--text-muted); }
-    .dscr-year .v { font-size: 16px; font-weight: 700; }
-    .dscr-year .v.green { color: var(--green); }
-    .dscr-year .v.amber { color: var(--amber); }
-    .dscr-year .v.red { color: var(--red); }
-    .dscr-arrow { align-self: center; color: var(--text-muted); font-size: 14px; }
 
     /* CHARTS */
     .chart-grid {
@@ -264,11 +246,12 @@
       color: var(--amber);
       border-radius: 4px;
       padding: 2px 8px;
+      white-space: nowrap;
     }
     .chart-wrap { position: relative; height: 220px; }
     .chart-wrap.tall { height: 300px; }
 
-    /* MONTHLY YoY TABLE */
+    /* YOY TABLE */
     .yoy-table-wrap {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -324,24 +307,9 @@
     .loan-value.amber { color: var(--amber); }
     .loan-note { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
     .loan-progress-wrap { margin-top: 10px; }
-    .loan-progress-bar {
-      height: 6px;
-      background: var(--border);
-      border-radius: 3px;
-      overflow: hidden;
-    }
-    .loan-progress-fill {
-      height: 100%;
-      background: var(--amber);
-      border-radius: 3px;
-    }
-    .loan-progress-labels {
-      display: flex;
-      justify-content: space-between;
-      font-size: 10px;
-      color: var(--text-muted);
-      margin-top: 4px;
-    }
+    .loan-progress-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+    .loan-progress-fill { height: 100%; background: var(--amber); border-radius: 3px; }
+    .loan-progress-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-top: 4px; }
 
     /* ── TAB NAV ── */
     .tab-nav {
@@ -369,73 +337,380 @@
       white-space: nowrap;
     }
     .tab-btn:hover { color: var(--text-dim); }
-    .tab-btn.active {
-      border-bottom-color: var(--amber);
-      color: var(--amber);
-    }
+    .tab-btn.active { border-bottom-color: var(--amber); color: var(--amber); }
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
 
-    /* ── STR SPECIFIC ── */
-    .str-kpi-grid {
+    /* ══════════════════════════════════════════
+       STR PERFORMANCE — UPGRADED STYLES
+    ══════════════════════════════════════════ */
+
+    .str-main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px 64px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    /* ── A. KPI HERO CARDS ── */
+    .str-hero-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 16px;
     }
-    .str-kpi-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
+    .str-hero-card {
+      background: var(--str-bg-card);
+      border: 1px solid var(--str-border);
       border-radius: 12px;
       padding: 20px;
       position: relative;
       overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.2s;
     }
-    .str-kpi-card::before {
+    .str-hero-card:hover { border-color: var(--str-accent-blue); }
+    .str-hero-card::before {
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0;
-      height: 2px;
-      background: var(--amber);
-      opacity: 0.4;
+      height: 3px;
+      background: var(--card-accent, var(--str-accent-blue));
     }
-    .str-kpi-label { font-size: 11px; color: var(--text-muted); font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; }
-    .str-kpi-value { font-size: 28px; font-weight: 700; color: var(--text); margin: 8px 0 4px; line-height: 1; }
-    .str-kpi-value.amber { color: var(--amber); }
-    .str-kpi-index { font-size: 13px; font-weight: 600; margin-top: 4px; }
-    .str-kpi-index.above { color: var(--green); }
-    .str-kpi-index.below { color: var(--red); }
-    .str-kpi-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .str-hero-label {
+      font-size: 11px;
+      color: var(--str-text-secondary);
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .str-hero-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--str-text-primary);
+      margin: 10px 0 4px;
+      line-height: 1;
+    }
+    .str-hero-value.green { color: var(--str-accent-green); }
+    .str-hero-value.amber { color: var(--str-accent-amber); }
+    .str-hero-delta {
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 2px;
+    }
+    .str-hero-delta.pos { color: var(--str-accent-green); }
+    .str-hero-delta.neg { color: var(--str-accent-red); }
+    .str-hero-delta.neu { color: var(--str-text-muted); }
+    .str-hero-sub { font-size: 11px; color: var(--str-text-muted); margin-top: 4px; }
+    .str-sparkline-wrap { margin-top: 12px; height: 40px; position: relative; }
+    .str-sparkline-wrap canvas { display: block; }
 
-    .str-best-worst-wrap {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
+    /* Circular progress for win rate */
+    .str-win-ring {
+      position: relative;
+      width: 64px;
+      height: 64px;
+      margin: 10px 0 4px;
     }
+    .str-win-ring svg { transform: rotate(-90deg); }
+    .str-win-ring-text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--str-accent-green);
+    }
+
+    /* ── INSIGHTS BAR ── */
+    .str-insights-bar {
+      background: var(--str-bg-surface);
+      border: 1px solid var(--str-border);
+      border-left: 4px solid var(--str-accent-amber);
+      border-radius: 8px;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 52px;
+    }
+    .str-insights-icon { font-size: 18px; flex-shrink: 0; }
+    .str-insights-text {
+      font-size: 13px;
+      color: var(--str-text-secondary);
+      line-height: 1.5;
+      flex: 1;
+    }
+    .str-insights-text strong { color: var(--str-text-primary); }
+    .str-insights-dots {
+      display: flex;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    .str-insights-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--str-border);
+      transition: background 0.3s;
+    }
+    .str-insights-dot.active { background: var(--str-accent-amber); }
+
+    /* ── SECTION HEADERS ── */
+    .str-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: -8px;
+    }
+    .str-section-title {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      color: var(--str-text-muted);
+      text-transform: uppercase;
+    }
+
+    /* ── B. TREND INTELLIGENCE ── */
+    .str-chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .str-chart-card {
+      background: var(--str-bg-card);
+      border: 1px solid var(--str-border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .str-chart-card.full { grid-column: span 2; }
+    .str-chart-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .str-chart-title { font-size: 14px; font-weight: 600; color: var(--str-text-primary); }
+    .str-chart-sub { font-size: 12px; color: var(--str-text-secondary); margin-top: 2px; }
+    .str-chart-tag {
+      font-size: 10px;
+      background: rgba(96,165,250,0.1);
+      border: 1px solid rgba(96,165,250,0.3);
+      color: var(--str-accent-blue);
+      border-radius: 4px;
+      padding: 2px 8px;
+      white-space: nowrap;
+    }
+    .str-chart-wrap { position: relative; height: 260px; }
+    .str-chart-wrap.tall { height: 320px; }
+    .str-chart-wrap.short { height: 200px; }
+
+    /* Season legend */
+    .str-season-legend {
+      display: flex;
+      gap: 16px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    .str-season-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--str-text-muted);
+    }
+    .str-season-swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 2px;
+    }
+
+    /* Zone legend */
+    .str-zone-legend {
+      display: flex;
+      gap: 16px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    .str-zone-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--str-text-muted);
+    }
+    .str-zone-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    /* ── C. PATTERN ANALYSIS ── */
+
+    /* Heatmap */
+    .str-heatmap-wrap {
+      overflow-x: auto;
+    }
+    .str-heatmap-table {
+      border-collapse: separate;
+      border-spacing: 3px;
+      font-size: 11px;
+      width: 100%;
+    }
+    .str-heatmap-table th {
+      background: transparent;
+      color: var(--str-text-muted);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 4px 6px;
+      text-align: center;
+    }
+    .str-heatmap-table th:first-child { text-align: left; }
+    .str-heatmap-cell {
+      border-radius: 6px;
+      text-align: center;
+      padding: 8px 4px;
+      font-size: 11px;
+      font-weight: 600;
+      min-width: 62px;
+      cursor: default;
+      position: relative;
+      transition: transform 0.15s;
+    }
+    .str-heatmap-cell:hover { transform: scale(1.05); z-index: 1; }
+    .str-heatmap-cell.empty {
+      background: rgba(255,255,255,0.03);
+      color: var(--str-text-muted);
+    }
+    .str-heatmap-cell.anomaly::after {
+      content: '⚠';
+      position: absolute;
+      top: 2px;
+      right: 4px;
+      font-size: 9px;
+      color: var(--str-accent-amber);
+    }
+    .str-year-label {
+      color: var(--str-text-secondary);
+      font-weight: 600;
+      font-size: 12px;
+      padding: 4px 8px;
+    }
+    .str-year-label.current {
+      color: var(--str-accent-blue);
+      border-left: 3px solid var(--str-accent-blue);
+      padding-left: 5px;
+    }
+
+    /* ── D. RECORDS & STREAKS ── */
+    .str-records-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .str-record-card {
+      background: var(--str-bg-card);
+      border: 1px solid var(--str-border);
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .str-record-icon { font-size: 18px; }
+    .str-record-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--str-text-primary);
+      margin: 2px 0;
+    }
+    .str-record-label { font-size: 11px; color: var(--str-text-secondary); font-weight: 500; }
+    .str-record-when { font-size: 10px; color: var(--str-text-muted); margin-top: 2px; }
+
+    /* Best/Worst tables */
     .str-bw-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 0;
+      gap: 20px;
+      margin-top: 8px;
     }
-    .str-bw-section { padding: 16px 20px; }
-    .str-bw-section:first-child { border-right: 1px solid var(--border); }
-    .str-bw-title { font-size: 13px; font-weight: 600; margin-bottom: 12px; }
-    .str-bw-title.gold { color: var(--amber); }
-    .str-bw-title.dim { color: var(--text-muted); }
+    .str-bw-card {
+      background: var(--str-bg-card);
+      border: 1px solid var(--str-border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .str-bw-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--str-border);
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .str-bw-header.gold { color: var(--str-accent-amber); }
+    .str-bw-header.dim { color: var(--str-text-muted); }
     .str-bw-row {
-      display: flex;
-      justify-content: space-between;
+      display: grid;
+      grid-template-columns: 90px 1fr auto;
+      gap: 8px;
       align-items: center;
-      padding: 6px 0;
+      padding: 9px 16px;
       border-bottom: 1px solid rgba(255,255,255,0.04);
       font-size: 12px;
     }
     .str-bw-row:last-child { border-bottom: none; }
-    .str-bw-week { color: var(--text-dim); }
-    .str-bw-metrics { display: flex; gap: 16px; align-items: center; }
-    .str-bw-rgi-best { color: var(--green); font-weight: 700; font-size: 14px; }
-    .str-bw-rgi-worst { color: var(--red); font-weight: 700; font-size: 14px; }
-    .str-bw-detail { color: var(--text-muted); font-size: 11px; }
+    .str-bw-week { color: var(--str-text-secondary); font-family: monospace; font-size: 11px; }
+    .str-bw-detail { color: var(--str-text-muted); font-size: 11px; }
+    .str-bw-rgi-best { color: var(--str-accent-green); font-weight: 700; font-size: 15px; text-align: right; }
+    .str-bw-rgi-worst { color: var(--str-accent-red); font-weight: 700; font-size: 15px; text-align: right; }
+
+    /* ── E. DATA TABLE ── */
+    .str-monthly-table-wrap {
+      background: var(--str-bg-card);
+      border: 1px solid var(--str-border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .str-monthly-table-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--str-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .str-monthly-table-wrap table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .str-monthly-table-wrap thead th {
+      background: var(--str-bg-surface);
+      color: var(--str-text-muted);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 9px 12px;
+      text-align: right;
+    }
+    .str-monthly-table-wrap thead th:first-child { text-align: left; }
+    .str-monthly-table-wrap tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .str-monthly-table-wrap tbody tr:last-child { border-bottom: none; }
+    .str-monthly-table-wrap tbody tr:hover { background: rgba(96,165,250,0.04); }
+    .str-monthly-table-wrap tbody td { padding: 9px 12px; text-align: right; }
+    .str-monthly-table-wrap tbody td:first-child { text-align: left; color: var(--str-text-secondary); font-weight: 500; font-family: monospace; font-size: 11px; }
+
+    /* RGI cell conditional formatting */
+    .rgi-dominant { background: rgba(74,222,128,0.15); color: var(--str-accent-green); font-weight: 700; border-radius: 4px; padding: 2px 6px; }
+    .rgi-winning { background: rgba(96,165,250,0.12); color: var(--str-accent-blue); font-weight: 700; border-radius: 4px; padding: 2px 6px; }
+    .rgi-losing { background: rgba(248,113,113,0.12); color: var(--str-accent-red); font-weight: 700; border-radius: 4px; padding: 2px 6px; }
 
     /* FOOTER */
     footer {
@@ -450,18 +725,24 @@
     @media (max-width: 900px) {
       header { padding: 16px 20px; }
       main { padding: 20px 16px 48px; }
+      .str-main { padding: 20px 16px 48px; }
       .kpi-grid { grid-template-columns: repeat(2, 1fr); }
       .chart-grid { grid-template-columns: 1fr; }
       .chart-card.full { grid-column: span 1; }
-      .dscr-card { grid-column: span 2; }
       .loan-grid { grid-template-columns: 1fr 1fr; }
       .refi-stats { display: none; }
+      .str-hero-grid { grid-template-columns: repeat(2, 1fr); }
+      .str-chart-grid { grid-template-columns: 1fr; }
+      .str-chart-card.full { grid-column: span 1; }
+      .str-records-grid { grid-template-columns: repeat(2, 1fr); }
+      .str-bw-grid { grid-template-columns: 1fr; }
     }
     @media (max-width: 580px) {
       .kpi-grid { grid-template-columns: 1fr 1fr; }
-      .dscr-card { flex-direction: column; }
-      .loan-grid { grid-template-columns: 1fr; }
       .kpi-value { font-size: 22px; }
+      .str-hero-grid { grid-template-columns: 1fr 1fr; }
+      .str-hero-value { font-size: 24px; }
+      .str-records-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -492,7 +773,7 @@
       </div>
     </div>
     <div class="header-right">
-      <strong>Data through Feb 2026</strong><br>
+      <strong>Data through Mar 2026</strong><br>
       Debt service $967,749/yr · Matures Sep 2027
     </div>
   </header>
@@ -503,143 +784,68 @@
     <button class="tab-btn" onclick="switchTab('str', this)">🏆 STR Performance</button>
   </nav>
 
+  <!-- ═══════════════════════════════════════════════════════════════ -->
   <!-- FINANCIAL TAB -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
   <div id="tab-financial" class="tab-panel active">
   <main>
-
     <!-- REFI BANNER -->
     <div class="refi-banner">
       <div class="refi-icon">⏳</div>
       <div class="refi-text">
         <h3>Refinance Window — 18 Months Out</h3>
-        <p>Loan matures <strong>Sep 15, 2027</strong>. Refi flag set for <strong>Feb 1, 2027</strong> with target close <strong>May 2027</strong>. 
-           Current balance <strong>$13,408,631</strong> at 3.25% fixed. Friendly bank relationship in place. 
+        <p>Loan matures <strong>Sep 15, 2027</strong>. Refi flag set for <strong>Feb 1, 2027</strong> with target close <strong>May 2027</strong>.
+           Current balance <strong>$13,408,631</strong> at 3.25% fixed. Friendly bank relationship in place.
            DSCR is declining — lender conversations should begin <strong>Q4 2026</strong>.</p>
       </div>
       <div class="refi-stats">
-        <div class="refi-stat">
-          <div class="val">$13.4M</div>
-          <div class="lbl">Balance</div>
-        </div>
-        <div class="refi-stat">
-          <div class="val">3.25%</div>
-          <div class="lbl">Rate</div>
-        </div>
-        <div class="refi-stat">
-          <div class="val">Sep '27</div>
-          <div class="lbl">Maturity</div>
-        </div>
+        <div class="refi-stat"><div class="val">$13.4M</div><div class="lbl">Balance</div></div>
+        <div class="refi-stat"><div class="val">3.25%</div><div class="lbl">Rate</div></div>
+        <div class="refi-stat"><div class="val">Sep '27</div><div class="lbl">Maturity</div></div>
       </div>
     </div>
 
-    <!-- TOP KPIs -->
     <div class="section-label">2025 Full Year</div>
-    <div class="kpi-grid" id="kpi-grid">
-      <!-- Populated by JS -->
-    </div>
+    <div class="kpi-grid" id="kpi-grid"></div>
 
-    <!-- 2026 EARLY SIGNAL -->
     <div class="section-label">2026 Early Signal (Jan–Feb YoY)</div>
-    <div class="kpi-grid" id="kpi-2026">
-      <!-- Populated by JS -->
-    </div>
+    <div class="kpi-grid" id="kpi-2026"></div>
 
-    <!-- REVENUE & NOI CHARTS -->
     <div class="section-label">Year-over-Year Trends (2023–2025)</div>
     <div class="chart-grid">
       <div class="chart-card full">
         <div class="chart-header">
-          <div>
-            <div class="chart-title">Annual Revenue &amp; NOP</div>
-            <div class="chart-sub">Total revenue vs Net Operating Profit — YoY comparison</div>
-          </div>
+          <div><div class="chart-title">Annual Revenue &amp; NOP</div><div class="chart-sub">Total revenue vs Net Operating Profit — YoY comparison</div></div>
           <span class="chart-tag">YoY Only</span>
         </div>
-        <div class="chart-wrap tall">
-          <canvas id="revNopChart"></canvas>
-        </div>
+        <div class="chart-wrap tall"><canvas id="revNopChart"></canvas></div>
       </div>
-
       <div class="chart-card">
-        <div class="chart-header">
-          <div>
-            <div class="chart-title">DSCR Trend</div>
-            <div class="chart-sub">Debt service coverage ratio by year</div>
-          </div>
-        </div>
-        <div class="chart-wrap">
-          <canvas id="dscrChart"></canvas>
-        </div>
+        <div class="chart-header"><div><div class="chart-title">DSCR Trend</div><div class="chart-sub">Debt service coverage ratio by year</div></div></div>
+        <div class="chart-wrap"><canvas id="dscrChart"></canvas></div>
       </div>
-
       <div class="chart-card">
-        <div class="chart-header">
-          <div>
-            <div class="chart-title">NOP Margin</div>
-            <div class="chart-sub">Net operating profit as % of revenue</div>
-          </div>
-        </div>
-        <div class="chart-wrap">
-          <canvas id="marginChart"></canvas>
-        </div>
+        <div class="chart-header"><div><div class="chart-title">NOP Margin</div><div class="chart-sub">Net operating profit as % of revenue</div></div></div>
+        <div class="chart-wrap"><canvas id="marginChart"></canvas></div>
       </div>
-
       <div class="chart-card">
-        <div class="chart-header">
-          <div>
-            <div class="chart-title">Occupancy — YoY</div>
-            <div class="chart-sub">Monthly occupancy % · 2023 vs 2024 vs 2025</div>
-          </div>
-          <span class="chart-tag">YoY Only</span>
-        </div>
-        <div class="chart-wrap">
-          <canvas id="occChart"></canvas>
-        </div>
+        <div class="chart-header"><div><div class="chart-title">Occupancy — YoY</div><div class="chart-sub">Monthly occupancy % · 2023 vs 2024 vs 2025</div></div><span class="chart-tag">YoY Only</span></div>
+        <div class="chart-wrap"><canvas id="occChart"></canvas></div>
       </div>
-
       <div class="chart-card">
-        <div class="chart-header">
-          <div>
-            <div class="chart-title">ADR &amp; RevPAR — YoY</div>
-            <div class="chart-sub">Average daily rate vs revenue per available room</div>
-          </div>
-          <span class="chart-tag">YoY Only</span>
-        </div>
-        <div class="chart-wrap">
-          <canvas id="adrChart"></canvas>
-        </div>
+        <div class="chart-header"><div><div class="chart-title">ADR &amp; RevPAR — YoY</div><div class="chart-sub">Average daily rate vs revenue per available room</div></div><span class="chart-tag">YoY Only</span></div>
+        <div class="chart-wrap"><canvas id="adrChart"></canvas></div>
       </div>
     </div>
 
-    <!-- YoY TABLE -->
     <div class="section-label">Monthly Revenue — YoY Detail (2024 vs 2025)</div>
     <div class="yoy-table-wrap">
       <div class="yoy-table-header">
-        <div>
-          <div class="chart-title">Revenue — 2024 vs 2025</div>
-          <div class="chart-sub">Month-by-month year-over-year comparison · Total Revenue</div>
-        </div>
+        <div><div class="chart-title">Revenue — 2024 vs 2025</div><div class="chart-sub">Month-by-month year-over-year comparison · Total Revenue</div></div>
       </div>
-      <div style="overflow-x:auto;">
-        <table id="yoy-table">
-          <thead>
-            <tr>
-              <th>Month</th>
-              <th>2024</th>
-              <th>2025</th>
-              <th>Change $</th>
-              <th>Change %</th>
-              <th>2024 NOP</th>
-              <th>2025 NOP</th>
-              <th>NOP Δ%</th>
-            </tr>
-          </thead>
-          <tbody id="yoy-tbody"></tbody>
-        </table>
-      </div>
+      <div style="overflow-x:auto;"><table id="yoy-table"><thead><tr><th>Month</th><th>2024</th><th>2025</th><th>Change $</th><th>Change %</th><th>2024 NOP</th><th>2025 NOP</th><th>NOP Δ%</th></tr></thead><tbody id="yoy-tbody"></tbody></table></div>
     </div>
 
-    <!-- LOAN SECTION -->
     <div class="section-label">Loan &amp; Debt Service</div>
     <div class="loan-grid">
       <div class="loan-card">
@@ -647,13 +853,8 @@
         <div class="loan-value amber">$13,408,631</div>
         <div class="loan-note">$16M original · Jan 2019</div>
         <div class="loan-progress-wrap">
-          <div class="loan-progress-bar">
-            <div class="loan-progress-fill" style="width: 16.2%"></div>
-          </div>
-          <div class="loan-progress-labels">
-            <span>$13.4M remaining</span>
-            <span>16.2% paid</span>
-          </div>
+          <div class="loan-progress-bar"><div class="loan-progress-fill" style="width: 16.2%"></div></div>
+          <div class="loan-progress-labels"><span>$13.4M remaining</span><span>16.2% paid</span></div>
         </div>
       </div>
       <div class="loan-card">
@@ -667,102 +868,181 @@
         <div class="loan-note">Refi flag: Feb 1, 2027 · Target close: May 2027</div>
       </div>
     </div>
-
   </main>
-  </div><!-- /tab-financial -->
+  </div>
 
-  <!-- STR PERFORMANCE TAB -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
+  <!-- STR PERFORMANCE TAB — UPGRADED -->
+  <!-- ═══════════════════════════════════════════════════════════════ -->
   <div id="tab-str" class="tab-panel">
-  <main>
+  <div class="str-main">
 
-    <!-- STR KPI CARDS -->
-    <div class="section-label">Latest Week — Mar 15, 2026 vs Comp Set</div>
-    <div class="str-kpi-grid" id="str-kpi-grid"><!-- js --></div>
+    <!-- ── A. KPI HERO CARDS ── -->
+    <div class="str-section-header">
+      <span class="str-section-title">Current Performance — Week of Mar 15, 2026</span>
+    </div>
+    <div class="str-hero-grid" id="str-hero-grid">
+      <!-- Card 1: RGI -->
+      <div class="str-hero-card" style="--card-accent: var(--str-accent-green);" onclick="scrollToSection('str-section-b')">
+        <div class="str-hero-label">RevPAR Index</div>
+        <div class="str-hero-value green" id="hero-rgi">123.7</div>
+        <div class="str-hero-delta pos" id="hero-rgi-delta">▲ +6.8 pts vs 13wk avg</div>
+        <div class="str-hero-sub">RGI ≥ 120 = strong outperformance</div>
+        <div class="str-sparkline-wrap"><canvas id="sparkline-rgi"></canvas></div>
+      </div>
 
-    <!-- TRAILING 12 MO -->
-    <div class="section-label">Trailing 12 Months (Apr 2025 – Mar 2026)</div>
-    <div class="str-kpi-grid" id="str-t12-grid"><!-- js --></div>
+      <!-- Card 2: RevPAR -->
+      <div class="str-hero-card" style="--card-accent: var(--str-accent-blue);" onclick="scrollToSection('str-section-b')">
+        <div class="str-hero-label">RevPAR</div>
+        <div class="str-hero-value" id="hero-revpar">$209.68</div>
+        <div class="str-hero-delta" id="hero-revpar-delta">▲ +4.5% vs same wk LY</div>
+        <div class="str-hero-sub" id="hero-revpar-sub">Comp: $169.50</div>
+        <div class="str-sparkline-wrap"><canvas id="sparkline-revpar"></canvas></div>
+      </div>
 
-    <!-- REVPAR TREND -->
-    <div class="section-label">RevPAR Trend — Weekly (Jan 2024 – Mar 2026)</div>
-    <div class="chart-grid">
-      <div class="chart-card full">
-        <div class="chart-header">
-          <div>
-            <div class="chart-title">RevPAR — Property vs Comp Set</div>
-            <div class="chart-sub">Weekly revenue per available room · 93 data points</div>
-          </div>
-          <span class="chart-tag">STAR Data</span>
+      <!-- Card 3: Win Rate -->
+      <div class="str-hero-card" style="--card-accent: var(--str-accent-amber);" onclick="scrollToSection('str-section-b')">
+        <div class="str-hero-label">Comp Set Win Rate</div>
+        <div class="str-win-ring" id="hero-win-ring-wrap">
+          <svg width="64" height="64" viewBox="0 0 64 64">
+            <circle cx="32" cy="32" r="28" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="6"/>
+            <circle id="win-ring-arc" cx="32" cy="32" r="28" fill="none" stroke="#4ade80" stroke-width="6" stroke-dasharray="175.9 175.9" stroke-linecap="round"/>
+          </svg>
+          <div class="str-win-ring-text">100%</div>
         </div>
-        <div class="chart-wrap tall">
-          <canvas id="strRevparChart"></canvas>
+        <div class="str-hero-delta pos">▲ 93-week win streak</div>
+        <div class="str-hero-sub">Every tracked week: RGI &gt; 100</div>
+      </div>
+
+      <!-- Card 4: ADR Premium -->
+      <div class="str-hero-card" style="--card-accent: var(--str-accent-purple);" onclick="scrollToSection('str-section-c')">
+        <div class="str-hero-label">Rate Premium</div>
+        <div class="str-hero-value" id="hero-ari">116.3</div>
+        <div class="str-hero-delta pos" id="hero-ari-delta">▲ +$30.78 over comp ADR</div>
+        <div class="str-hero-sub">Comp ADR: $188.60 · Prop: $219.38</div>
+        <div class="str-sparkline-wrap"><canvas id="sparkline-ari"></canvas></div>
+      </div>
+    </div>
+
+    <!-- ── INSIGHTS BAR ── -->
+    <div class="str-insights-bar">
+      <div class="str-insights-icon">💡</div>
+      <div class="str-insights-text" id="insights-text">Loading insights…</div>
+      <div class="str-insights-dots" id="insights-dots"></div>
+    </div>
+
+    <!-- ── B. TREND INTELLIGENCE ── -->
+    <div id="str-section-b" class="str-section-header">
+      <span class="str-section-title">B. Trend Intelligence — 93 Weeks</span>
+    </div>
+    <div class="str-chart-grid">
+      <!-- B1: RevPAR Trend -->
+      <div class="str-chart-card">
+        <div class="str-chart-header">
+          <div>
+            <div class="str-chart-title">RevPAR Trend — Property vs Comp Set</div>
+            <div class="str-chart-sub">Weekly, Jan 2024 – Mar 2026 · Seasonal bands overlaid</div>
+          </div>
+          <span class="str-chart-tag">93 weeks</span>
+        </div>
+        <div class="str-chart-wrap tall"><canvas id="strRevparChart"></canvas></div>
+        <div class="str-season-legend">
+          <div class="str-season-item"><div class="str-season-swatch" style="background:rgba(74,222,128,0.3)"></div>Peak (Feb–Apr)</div>
+          <div class="str-season-item"><div class="str-season-swatch" style="background:rgba(251,191,36,0.2)"></div>Shoulder</div>
+          <div class="str-season-item"><div class="str-season-swatch" style="background:rgba(248,113,113,0.2)"></div>Trough (Jul–Aug, Dec)</div>
         </div>
       </div>
 
-      <!-- RGI TREND -->
-      <div class="chart-card full">
-        <div class="chart-header">
+      <!-- B2: Competitive Dominance -->
+      <div class="str-chart-card">
+        <div class="str-chart-header">
           <div>
-            <div class="chart-title">RevPAR Index (RGI) — Weekly</div>
-            <div class="chart-sub">Property RevPAR ÷ Comp Set RevPAR × 100 · Baseline = 100 (parity)</div>
+            <div class="str-chart-title">Competitive Dominance — RGI Weekly</div>
+            <div class="str-chart-sub">With 13-week rolling average · Zone thresholds · Record annotations</div>
           </div>
-          <span class="chart-tag">93 Weeks</span>
+          <span class="str-chart-tag">RGI</span>
         </div>
-        <div class="chart-wrap tall">
-          <canvas id="strRgiChart"></canvas>
-        </div>
-      </div>
-
-      <!-- OCC & ADR DUAL AXIS -->
-      <div class="chart-card">
-        <div class="chart-header">
-          <div>
-            <div class="chart-title">Occupancy &amp; ADR — Monthly Avg</div>
-            <div class="chart-sub">Property vs comp set · Dual axis</div>
-          </div>
-        </div>
-        <div class="chart-wrap tall">
-          <canvas id="strOccAdrChart"></canvas>
-        </div>
-      </div>
-
-      <!-- YoY RevPAR BAR -->
-      <div class="chart-card">
-        <div class="chart-header">
-          <div>
-            <div class="chart-title">RevPAR by Month — YoY</div>
-            <div class="chart-sub">2024 vs 2025 vs 2026 YTD</div>
-          </div>
-          <span class="chart-tag">YoY</span>
-        </div>
-        <div class="chart-wrap tall">
-          <canvas id="strYoyChart"></canvas>
+        <div class="str-chart-wrap tall"><canvas id="strRgiChart"></canvas></div>
+        <div class="str-zone-legend">
+          <div class="str-zone-item"><div class="str-zone-dot" style="background:var(--str-accent-green)"></div>Dominant ≥130</div>
+          <div class="str-zone-item"><div class="str-zone-dot" style="background:var(--str-accent-blue)"></div>Winning 100–129</div>
+          <div class="str-zone-item"><div class="str-zone-dot" style="background:var(--str-accent-red)"></div>Losing &lt;100</div>
+          <div class="str-zone-item"><div class="str-zone-dot" style="background:var(--str-accent-purple)"></div>13wk Avg</div>
         </div>
       </div>
     </div>
 
-    <!-- BEST / WORST WEEKS -->
-    <div class="section-label">Best &amp; Worst Performing Weeks by RGI</div>
-    <div class="str-best-worst-wrap">
-      <div class="str-bw-grid">
-        <div class="str-bw-section">
-          <div class="str-bw-title gold">🏆 Top 5 Weeks by RGI</div>
-          <div id="str-best-weeks"><!-- js --></div>
+    <!-- ── C. PATTERN ANALYSIS ── -->
+    <div id="str-section-c" class="str-section-header">
+      <span class="str-section-title">C. Pattern Analysis</span>
+    </div>
+    <div class="str-chart-grid">
+      <!-- C1: Index Decomposition -->
+      <div class="str-chart-card">
+        <div class="str-chart-header">
+          <div>
+            <div class="str-chart-title">Index Decomposition — Where Does Our Advantage Come From?</div>
+            <div class="str-chart-sub">MPI (occupancy) + ARI (rate) → RGI · Monthly</div>
+          </div>
+          <span class="str-chart-tag">Monthly</span>
         </div>
-        <div class="str-bw-section">
-          <div class="str-bw-title dim">⚠️ Bottom 5 Weeks by RGI</div>
-          <div id="str-worst-weeks"><!-- js --></div>
+        <div class="str-chart-wrap tall"><canvas id="strIndexChart"></canvas></div>
+        <div class="str-season-legend">
+          <div class="str-season-item"><div class="str-season-swatch" style="background:rgba(74,222,128,0.6)"></div>MPI (Occ Index)</div>
+          <div class="str-season-item"><div class="str-season-swatch" style="background:rgba(96,165,250,0.6)"></div>ARI (Rate Index)</div>
+          <div class="str-season-item"><div class="str-season-swatch" style="background:var(--str-accent-amber)"></div>RGI line</div>
+        </div>
+      </div>
+
+      <!-- C2: Seasonal Heatmap -->
+      <div class="str-chart-card">
+        <div class="str-chart-header">
+          <div>
+            <div class="str-chart-title">Seasonal Performance Heatmap</div>
+            <div class="str-chart-sub">RGI by month × year · Color: low→high</div>
+          </div>
+          <span class="str-chart-tag">Heatmap</span>
+        </div>
+        <div class="str-heatmap-wrap" id="str-heatmap-wrap">
+          <!-- Built by JS -->
+        </div>
+        <div class="str-season-legend" style="margin-top:12px;">
+          <div class="str-season-item"><div class="str-season-swatch" style="background:#1e3a5f"></div>Low RGI</div>
+          <div class="str-season-item"><div class="str-season-swatch" style="background:#60a5fa"></div>Mid</div>
+          <div class="str-season-item"><div class="str-season-swatch" style="background:#4ade80"></div>High RGI</div>
         </div>
       </div>
     </div>
 
-    <!-- COMPETITIVE SUMMARY TABLE -->
-    <div class="section-label">Monthly Performance — Full History</div>
-    <div class="yoy-table-wrap">
-      <div class="yoy-table-header">
+    <!-- ── D. RECORDS & STREAKS ── -->
+    <div id="str-section-d" class="str-section-header">
+      <span class="str-section-title">D. Records &amp; Streaks</span>
+    </div>
+    <div class="str-records-grid" id="str-records-grid">
+      <!-- Built by JS -->
+    </div>
+
+    <!-- Best / Worst Weeks -->
+    <div class="str-bw-grid">
+      <div class="str-bw-card">
+        <div class="str-bw-header gold">🏆 Top 5 Weeks by RGI</div>
+        <div id="str-best-weeks"></div>
+      </div>
+      <div class="str-bw-card">
+        <div class="str-bw-header dim">⚠️ Bottom 5 Weeks by RGI</div>
+        <div id="str-worst-weeks"></div>
+      </div>
+    </div>
+
+    <!-- ── E. MONTHLY DATA TABLE ── -->
+    <div id="str-section-e" class="str-section-header">
+      <span class="str-section-title">E. Monthly Performance — Full History</span>
+    </div>
+    <div class="str-monthly-table-wrap">
+      <div class="str-monthly-table-header">
         <div>
-          <div class="chart-title">Monthly STR Summary</div>
-          <div class="chart-sub">All months 2024–2026 · Occ%, ADR, RevPAR, RGI vs comp set</div>
+          <div class="str-chart-title">Monthly STR Summary — All Months 2024–2026</div>
+          <div class="str-chart-sub">Occ%, ADR, RevPAR, RGI vs comp set · RGI color-coded: <span style="color:var(--str-accent-green)">■ Dominant ≥130</span> · <span style="color:var(--str-accent-blue)">■ Winning 100–129</span> · <span style="color:var(--str-accent-red)">■ Below 100</span></div>
         </div>
       </div>
       <div style="overflow-x:auto;">
@@ -781,12 +1061,12 @@
               <th>RGI</th>
             </tr>
           </thead>
-          <tbody id="str-monthly-tbody"><!-- js --></tbody>
+          <tbody id="str-monthly-tbody"></tbody>
         </table>
       </div>
     </div>
 
-  </main>
+  </div>
   </div><!-- /tab-str -->
 
   <footer>
@@ -795,7 +1075,7 @@
 </div>
 
 <script>
-// ─── AUTH ───────────────────────────────────────────────────────────────────
+// ─── AUTH ─────────────────────────────────────────────────────────────────────
 function checkAuth(e) {
   e.preventDefault();
   const pw = document.getElementById('pw-input').value.trim();
@@ -811,7 +1091,7 @@ function checkAuth(e) {
   }
 }
 
-// ─── TAB SWITCHING ───────────────────────────────────────────────────────────
+// ─── TAB SWITCHING ────────────────────────────────────────────────────────────
 let strChartsBuilt = false;
 function switchTab(tab, btn) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
@@ -824,9 +1104,12 @@ function switchTab(tab, btn) {
   }
 }
 
-// ─── DATA ────────────────────────────────────────────────────────────────────
-// All monetary values in dollars (already divided from cents)
-// ADR/RevPAR in dollars (divided from cents where stored)
+function scrollToSection(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ─── FINANCIAL DATA ───────────────────────────────────────────────────────────
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
 const annual = {
@@ -835,65 +1118,37 @@ const annual = {
   2025: { rev: 6884571, nop: 1640281, gop: 3197070, dscr: 1.69, nopMargin: 0.238, avgOcc: 0.780 },
 };
 
-// Monthly data for 2024 and 2025
 const monthly = {
   2024: [
-    { m:1,  rev: 559126, nop:  50491, occ: 0.7672, adr: 160.83, revpar: 123.40 },
-    { m:2,  rev: 703287, nop: 256709, occ: 0.8761, adr: 195.65, revpar: 171.42 },
-    { m:3,  rev: 725257, nop: 280200, occ: 0.8402, adr: 201.54, revpar: 169.34 },
-    { m:4,  rev: 841632, nop: 361683, occ: 0.8315, adr: 238.24, revpar: 198.11 },
-    { m:5,  rev: 548849, nop: 128261, occ: 0.7496, adr: 164.95, revpar: 123.65 },
-    { m:6,  rev: 572662, nop: 150339, occ: 0.7959, adr: 165.56, revpar: 131.77 },
-    { m:7,  rev: 416212, nop:  27570, occ: 0.6806, adr: 140.71, revpar:  95.77 },
-    { m:8,  rev: 436349, nop:  35647, occ: 0.7077, adr: 138.40, revpar:  97.94 },
-    { m:9,  rev: 489491, nop:  92595, occ: 0.8095, adr: 142.15, revpar: 115.07 },
-    { m:10, rev: 671170, nop: 222852, occ: 0.9077, adr: 165.97, revpar: 150.65 },
-    { m:11, rev: 542839, nop: 141312, occ: 0.8395, adr: 152.62, revpar: 128.12 },
-    { m:12, rev: 562538, nop:  80922, occ: 0.8040, adr: 154.68, revpar: 124.36 },
+    {m:1,rev:559126,nop:50491,occ:0.7672,adr:160.83,revpar:123.40},{m:2,rev:703287,nop:256709,occ:0.8761,adr:195.65,revpar:171.42},
+    {m:3,rev:725257,nop:280200,occ:0.8402,adr:201.54,revpar:169.34},{m:4,rev:841632,nop:361683,occ:0.8315,adr:238.24,revpar:198.11},
+    {m:5,rev:548849,nop:128261,occ:0.7496,adr:164.95,revpar:123.65},{m:6,rev:572662,nop:150339,occ:0.7959,adr:165.56,revpar:131.77},
+    {m:7,rev:416212,nop:27570,occ:0.6806,adr:140.71,revpar:95.77},{m:8,rev:436349,nop:35647,occ:0.7077,adr:138.40,revpar:97.94},
+    {m:9,rev:489491,nop:92595,occ:0.8095,adr:142.15,revpar:115.07},{m:10,rev:671170,nop:222852,occ:0.9077,adr:165.97,revpar:150.65},
+    {m:11,rev:542839,nop:141312,occ:0.8395,adr:152.62,revpar:128.12},{m:12,rev:562538,nop:80922,occ:0.8040,adr:154.68,revpar:124.36},
   ],
   2025: [
-    { m:1,  rev: 622738, nop: 116589, occ: 0.8258, adr: 168.17, revpar: 138.88 },
-    { m:2,  rev: 751384, nop: 317523, occ: 0.9173, adr: 205.77, revpar: 188.75 },
-    { m:3,  rev: 846744, nop: 354299, occ: 0.9270, adr: 210.88, revpar: 195.49 },
-    { m:4,  rev: 748151, nop: 276035, occ: 0.7969, adr: 223.85, revpar: 178.39 },
-    { m:5,  rev: 620932, nop: 158923, occ: 0.7993, adr: 165.44, revpar: 132.23 },
-    { m:6,  rev: 510305, nop:  24272, occ: 0.7623, adr: 158.01, revpar: 120.45 },
-    { m:7,  rev: 396685, nop:   7702, occ: 0.6663, adr: 137.55, revpar:  91.64 },
-    { m:8,  rev: 489670, nop:  49190, occ: 0.7856, adr: 144.00, revpar: 113.13 },
-    { m:9,  rev: 404814, nop:    480, occ: 0.6997, adr: 132.66, revpar:  92.83 },
-    { m:10, rev: 545593, nop:  81469, occ: 0.8055, adr: 152.04, revpar: 122.47 },
-    { m:11, rev: 532780, nop: 158820, occ: 0.7369, adr: 165.45, revpar: 121.92 },
-    { m:12, rev: 414775, nop:  94979, occ: 0.6429, adr: 145.74, revpar:  93.70 },
+    {m:1,rev:622738,nop:116589,occ:0.8258,adr:168.17,revpar:138.88},{m:2,rev:751384,nop:317523,occ:0.9173,adr:205.77,revpar:188.75},
+    {m:3,rev:846744,nop:354299,occ:0.9270,adr:210.88,revpar:195.49},{m:4,rev:748151,nop:276035,occ:0.7969,adr:223.85,revpar:178.39},
+    {m:5,rev:620932,nop:158923,occ:0.7993,adr:165.44,revpar:132.23},{m:6,rev:510305,nop:24272,occ:0.7623,adr:158.01,revpar:120.45},
+    {m:7,rev:396685,nop:7702,occ:0.6663,adr:137.55,revpar:91.64},{m:8,rev:489670,nop:49190,occ:0.7856,adr:144.00,revpar:113.13},
+    {m:9,rev:404814,nop:480,occ:0.6997,adr:132.66,revpar:92.83},{m:10,rev:545593,nop:81469,occ:0.8055,adr:152.04,revpar:122.47},
+    {m:11,rev:532780,nop:158820,occ:0.7369,adr:165.45,revpar:121.92},{m:12,rev:414775,nop:94979,occ:0.6429,adr:145.74,revpar:93.70},
   ],
   2023: [
-    { m:1,  rev: 544890, nop:  83592, occ: 0.8035, adr: 150.21, revpar: 120.69 },
-    { m:2,  rev: 688385, nop: 239907, occ: 0.8956, adr: 197.21, revpar: 176.63 },
-    { m:3,  rev: 940484, nop: 479063, occ: 0.9136, adr: 248.99, revpar: 227.51 },
-    { m:4,  rev: 623940, nop: 194097, occ: 0.7733, adr: 191.20, revpar: 147.86 },
-    { m:5,  rev: 528373, nop: 108895, occ: 0.7439, adr: 158.91, revpar: 118.22 },
-    { m:6,  rev: 538036, nop: 129402, occ: 0.8359, adr: 154.38, revpar: 129.04 },
-    { m:7,  rev: 488821, nop:  91627, occ: 0.7757, adr: 140.54, revpar: 109.02 },
-    { m:8,  rev: 465115, nop:  45392, occ: 0.7759, adr: 133.08, revpar: 103.26 },
-    { m:9,  rev: 568622, nop: 158464, occ: 0.7885, adr: 167.33, revpar: 131.95 },
-    { m:10, rev: 568622, nop: 158464, occ: 0.7886, adr: 162.17, revpar: 127.89 },
-    { m:11, rev: 535669, nop: 142205, occ: 0.7692, adr: 153.62, revpar: 118.17 },
-    { m:12, rev: 480246, nop:  47410, occ: 0.7491, adr: 144.41, revpar: 108.18 },
+    {m:1,rev:544890,nop:83592,occ:0.8035,adr:150.21,revpar:120.69},{m:2,rev:688385,nop:239907,occ:0.8956,adr:197.21,revpar:176.63},
+    {m:3,rev:940484,nop:479063,occ:0.9136,adr:248.99,revpar:227.51},{m:4,rev:623940,nop:194097,occ:0.7733,adr:191.20,revpar:147.86},
+    {m:5,rev:528373,nop:108895,occ:0.7439,adr:158.91,revpar:118.22},{m:6,rev:538036,nop:129402,occ:0.8359,adr:154.38,revpar:129.04},
+    {m:7,rev:488821,nop:91627,occ:0.7757,adr:140.54,revpar:109.02},{m:8,rev:465115,nop:45392,occ:0.7759,adr:133.08,revpar:103.26},
+    {m:9,rev:568622,nop:158464,occ:0.7885,adr:167.33,revpar:131.95},{m:10,rev:568622,nop:158464,occ:0.7886,adr:162.17,revpar:127.89},
+    {m:11,rev:535669,nop:142205,occ:0.7692,adr:153.62,revpar:118.17},{m:12,rev:480246,nop:47410,occ:0.7491,adr:144.41,revpar:108.18},
   ],
 };
+const data2026 = { rev: 1389498, nop: 505672, occ: 0.860, adr: ((17029+21435)/2)/100 };
 
-const data2026 = {
-  rev: 1389498, nop: 505672,
-  occ: 0.860, adr: ((17029+21435)/2)/100,
-};
-
-// ─── CHART DEFAULTS ──────────────────────────────────────────────────────────
-const AMBER = '#f59e0b';
-const AMBER2 = 'rgba(245,158,11,0.7)';
-const AMBER3 = 'rgba(245,158,11,0.3)';
-const GREEN = '#22c55e';
-const RED = '#ef4444';
-const BLUE = '#60a5fa';
-const PURPLE = '#a78bfa';
+// ─── CHART DEFAULTS ───────────────────────────────────────────────────────────
+const AMBER = '#f59e0b', GREEN = '#22c55e', RED = '#ef4444', BLUE = '#60a5fa', PURPLE = '#a78bfa';
+const STR_BLUE = '#60a5fa', STR_GREEN = '#4ade80', STR_RED = '#f87171', STR_AMBER = '#fbbf24', STR_PURPLE = '#c084fc', STR_SLATE = '#94a3b8';
 
 Chart.defaults.color = '#6b7280';
 Chart.defaults.borderColor = '#2a2a30';
@@ -906,12 +1161,9 @@ function fmt$(n) {
   return '$' + n.toFixed(0);
 }
 function pct(n) { return (n*100).toFixed(1) + '%'; }
-function fmtDelta(n, prefix='') {
-  const sign = n >= 0 ? '+' : '';
-  return prefix + sign + n.toFixed(1) + '%';
-}
+function fmtDelta(n, prefix='') { const sign = n >= 0 ? '+' : ''; return prefix + sign + n.toFixed(1) + '%'; }
 
-// ─── INIT ────────────────────────────────────────────────────────────────────
+// ─── INIT ─────────────────────────────────────────────────────────────────────
 function initDashboard() {
   buildKPIs();
   build2026KPIs();
@@ -923,684 +1175,257 @@ function initDashboard() {
   buildYoYTable();
 }
 
-// ─── KPIs (2025) ─────────────────────────────────────────────────────────────
+// ─── FINANCIAL KPIs ───────────────────────────────────────────────────────────
 function buildKPIs() {
-  const a25 = annual[2025];
-  const a24 = annual[2024];
-
+  const a25 = annual[2025], a24 = annual[2024];
   const revChg = (a25.rev / a24.rev - 1) * 100;
   const nopChg = (a25.nop / a24.nop - 1) * 100;
-
   const cards = [
-    {
-      label: 'Total Revenue',
-      value: fmt$(a25.rev),
-      delta: fmtDelta(revChg),
-      deltaDir: revChg >= 0 ? 'up' : 'down',
-      sub: 'vs 2024 · YoY',
-    },
-    {
-      label: 'Net Operating Profit',
-      value: fmt$(a25.nop),
-      delta: fmtDelta(nopChg),
-      deltaDir: nopChg >= 0 ? 'up' : 'down',
-      sub: 'vs 2024 · YoY',
-    },
-    {
-      label: 'NOP Margin',
-      value: pct(a25.nopMargin),
-      delta: fmtDelta((a25.nopMargin - a24.nopMargin) * 100, ''),
-      deltaClass: a25.nopMargin >= a24.nopMargin ? 'up' : 'down',
-      sub: '2024 was 25.9%',
-      deltaDir: a25.nopMargin >= a24.nopMargin ? 'up' : 'down',
-    },
-    {
-      label: 'Avg Occupancy',
-      value: pct(a25.avgOcc),
-      delta: fmtDelta((a25.avgOcc - a24.avgOcc) * 100),
-      deltaDir: a25.avgOcc >= a24.avgOcc ? 'up' : 'down',
-      sub: '2024 was 80.1%',
-    },
+    { label:'Total Revenue', value:fmt$(a25.rev), delta:fmtDelta(revChg), deltaDir:revChg>=0?'up':'down', sub:'vs 2024 · YoY' },
+    { label:'Net Operating Profit', value:fmt$(a25.nop), delta:fmtDelta(nopChg), deltaDir:nopChg>=0?'up':'down', sub:'vs 2024 · YoY' },
+    { label:'NOP Margin', value:pct(a25.nopMargin), delta:fmtDelta((a25.nopMargin-a24.nopMargin)*100), deltaDir:a25.nopMargin>=a24.nopMargin?'up':'down', sub:'2024 was 25.9%' },
+    { label:'Avg Occupancy', value:pct(a25.avgOcc), delta:fmtDelta((a25.avgOcc-a24.avgOcc)*100), deltaDir:a25.avgOcc>=a24.avgOcc?'up':'down', sub:'2024 was 80.1%' },
   ];
-
-  const grid = document.getElementById('kpi-grid');
-  grid.innerHTML = cards.map(c => `
-    <div class="kpi-card">
-      <div class="kpi-label">${c.label}</div>
-      <div class="kpi-value">${c.value}</div>
-      <div class="kpi-delta ${c.deltaDir}">${c.deltaDir === 'up' ? '▲' : '▼'} ${c.delta}</div>
-      <div class="kpi-sub">${c.sub}</div>
-    </div>
+  document.getElementById('kpi-grid').innerHTML = cards.map(c => `
+    <div class="kpi-card"><div class="kpi-label">${c.label}</div><div class="kpi-value">${c.value}</div>
+    <div class="kpi-delta ${c.deltaDir}">${c.deltaDir==='up'?'▲':'▼'} ${c.delta}</div><div class="kpi-sub">${c.sub}</div></div>
   `).join('');
 }
 
-// ─── 2026 KPIs ───────────────────────────────────────────────────────────────
 function build2026KPIs() {
-  // Jan+Feb 2025 for comparison
   const rev25 = monthly[2025][0].rev + monthly[2025][1].rev;
   const nop25 = monthly[2025][0].nop + monthly[2025][1].nop;
   const occ25 = (monthly[2025][0].occ + monthly[2025][1].occ) / 2;
-
   const revChg = (data2026.rev / rev25 - 1) * 100;
   const nopChg = (data2026.nop / nop25 - 1) * 100;
   const occChg = (data2026.occ - occ25) * 100;
-
   const cards = [
-    {
-      label: '2026 Revenue (Jan–Feb)',
-      value: fmt$(data2026.rev),
-      delta: fmtDelta(revChg),
-      deltaDir: revChg >= 0 ? 'up' : 'down',
-      sub: 'vs 2025 Jan–Feb',
-    },
-    {
-      label: '2026 NOP (Jan–Feb)',
-      value: fmt$(data2026.nop),
-      delta: fmtDelta(nopChg),
-      deltaDir: nopChg >= 0 ? 'up' : 'down',
-      sub: 'vs 2025 Jan–Feb · +16.5%',
-      amber: true,
-    },
-    {
-      label: '2026 Avg Occupancy',
-      value: pct(data2026.occ),
-      delta: fmtDelta(occChg),
-      deltaDir: occChg >= 0 ? 'up' : 'down',
-      sub: 'vs 2025 Jan–Feb',
-      amber: true,
-    },
-    {
-      label: '2026 Avg ADR',
-      value: '$' + data2026.adr.toFixed(2),
-      delta: '',
-      deltaDir: 'neutral',
-      sub: 'Jan–Feb average',
-    },
+    { label:'2026 Revenue (Jan–Feb)', value:fmt$(data2026.rev), delta:fmtDelta(revChg), deltaDir:revChg>=0?'up':'down', sub:'vs 2025 Jan–Feb' },
+    { label:'2026 NOP (Jan–Feb)', value:fmt$(data2026.nop), delta:fmtDelta(nopChg), deltaDir:nopChg>=0?'up':'down', sub:'vs 2025 Jan–Feb', amber:true },
+    { label:'2026 Avg Occupancy', value:pct(data2026.occ), delta:fmtDelta(occChg), deltaDir:occChg>=0?'up':'down', sub:'vs 2025 Jan–Feb', amber:true },
+    { label:'2026 Avg ADR', value:'$'+data2026.adr.toFixed(2), delta:'', deltaDir:'neutral', sub:'Jan–Feb average' },
   ];
-
-  const grid = document.getElementById('kpi-2026');
-  grid.innerHTML = cards.map(c => `
-    <div class="kpi-card">
-      <div class="kpi-label">${c.label}</div>
-      <div class="kpi-value ${c.amber ? 'amber' : ''}">${c.value}</div>
-      ${c.delta ? `<div class="kpi-delta ${c.deltaDir}">${c.deltaDir === 'up' ? '▲' : (c.deltaDir === 'down' ? '▼' : '')} ${c.delta}</div>` : ''}
-      <div class="kpi-sub">${c.sub}</div>
-    </div>
+  document.getElementById('kpi-2026').innerHTML = cards.map(c => `
+    <div class="kpi-card"><div class="kpi-label">${c.label}</div><div class="kpi-value${c.amber?' amber':''}">${c.value}</div>
+    ${c.delta?`<div class="kpi-delta ${c.deltaDir}">${c.deltaDir==='up'?'▲':(c.deltaDir==='down'?'▼':'')} ${c.delta}</div>`:''}
+    <div class="kpi-sub">${c.sub}</div></div>
   `).join('');
 }
 
-// ─── REV + NOP CHART ─────────────────────────────────────────────────────────
 function buildRevNopChart() {
   const ctx = document.getElementById('revNopChart').getContext('2d');
-  const labels = ['2023', '2024', '2025'];
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [
-        {
-          label: 'Total Revenue',
-          data: [annual[2023].rev, annual[2024].rev, annual[2025].rev],
-          backgroundColor: 'rgba(245,158,11,0.25)',
-          borderColor: AMBER,
-          borderWidth: 2,
-          borderRadius: 6,
-        },
-        {
-          label: 'Net Operating Profit',
-          data: [annual[2023].nop, annual[2024].nop, annual[2025].nop],
-          backgroundColor: 'rgba(34,197,94,0.25)',
-          borderColor: GREEN,
-          borderWidth: 2,
-          borderRadius: 6,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { labels: { color: '#9ca3af', boxWidth: 12, padding: 16 } },
-        tooltip: {
-          callbacks: {
-            label: ctx => ' ' + ctx.dataset.label + ': ' + fmt$(ctx.raw),
-          },
-        },
-      },
-      scales: {
-        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280' } },
-        y: {
-          grid: { color: 'rgba(255,255,255,0.04)' },
-          ticks: { color: '#6b7280', callback: v => fmt$(v) },
-        },
-      },
-    },
-  });
+  new Chart(ctx, { type:'bar', data:{ labels:['2023','2024','2025'], datasets:[
+    { label:'Total Revenue', data:[annual[2023].rev,annual[2024].rev,annual[2025].rev], backgroundColor:'rgba(245,158,11,0.25)', borderColor:AMBER, borderWidth:2, borderRadius:6 },
+    { label:'Net Operating Profit', data:[annual[2023].nop,annual[2024].nop,annual[2025].nop], backgroundColor:'rgba(34,197,94,0.25)', borderColor:GREEN, borderWidth:2, borderRadius:6 },
+  ]}, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{labels:{color:'#9ca3af',boxWidth:12,padding:16}}, tooltip:{callbacks:{label:ctx=>' '+ctx.dataset.label+': '+fmt$(ctx.raw)}} }, scales:{ x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#6b7280'}}, y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#6b7280',callback:v=>fmt$(v)}} } } });
 }
 
-// ─── DSCR CHART ──────────────────────────────────────────────────────────────
 function buildDSCRChart() {
   const ctx = document.getElementById('dscrChart').getContext('2d');
-  const labels = ['2023', '2024', '2025'];
-  const vals = [1.94, 1.89, 1.69];
-  const colors = vals.map(v => v >= 2.0 ? GREEN : v >= 1.5 ? AMBER : RED);
-
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [{
-        label: 'DSCR',
-        data: vals,
-        backgroundColor: colors.map(c => c + '44'),
-        borderColor: colors,
-        borderWidth: 2,
-        borderRadius: 6,
-      }],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: ctx => ' DSCR: ' + ctx.raw.toFixed(2) + '×' } },
-        annotation: {},
-      },
-      scales: {
-        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280' } },
-        y: {
-          min: 0, max: 2.5,
-          grid: { color: 'rgba(255,255,255,0.04)' },
-          ticks: { color: '#6b7280', callback: v => v.toFixed(1) + '×' },
-        },
-      },
-    },
-    plugins: [{
-      id: 'threshold',
-      afterDraw(chart) {
-        const { ctx, chartArea: { left, right }, scales: { y } } = chart;
-        const y1 = y.getPixelForValue(1.0);
-        ctx.save();
-        ctx.strokeStyle = RED;
-        ctx.lineWidth = 1;
-        ctx.setLineDash([4,4]);
-        ctx.beginPath(); ctx.moveTo(left, y1); ctx.lineTo(right, y1); ctx.stroke();
-        ctx.fillStyle = RED;
-        ctx.font = '10px Inter, system-ui';
-        ctx.fillText('1.0× min', right - 52, y1 - 4);
-        const y2 = y.getPixelForValue(1.25);
-        ctx.strokeStyle = AMBER;
-        ctx.beginPath(); ctx.moveTo(left, y2); ctx.lineTo(right, y2); ctx.stroke();
-        ctx.fillStyle = AMBER;
-        ctx.fillText('1.25× threshold', right - 84, y2 - 4);
-        ctx.restore();
-      },
-    }],
-  });
+  const vals = [1.94,1.89,1.69];
+  const colors = vals.map(v => v>=2.0?GREEN:v>=1.5?AMBER:RED);
+  new Chart(ctx, { type:'bar', data:{ labels:['2023','2024','2025'], datasets:[{ label:'DSCR', data:vals, backgroundColor:colors.map(c=>c+'44'), borderColor:colors, borderWidth:2, borderRadius:6 }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{callbacks:{label:ctx=>' DSCR: '+ctx.raw.toFixed(2)+'×'}} }, scales:{ x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#6b7280'}}, y:{min:0,max:2.5,grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#6b7280',callback:v=>v.toFixed(1)+'×'}} } }, plugins:[{ id:'threshold', afterDraw(chart){ const{ctx:c,chartArea:{left,right},scales:{y}}=chart; const y1=y.getPixelForValue(1.0); c.save(); c.strokeStyle=RED; c.lineWidth=1; c.setLineDash([4,4]); c.beginPath();c.moveTo(left,y1);c.lineTo(right,y1);c.stroke(); c.fillStyle=RED; c.font='10px Inter,system-ui'; c.fillText('1.0× min',right-52,y1-4); const y2=y.getPixelForValue(1.25); c.strokeStyle=AMBER; c.beginPath();c.moveTo(left,y2);c.lineTo(right,y2);c.stroke(); c.fillStyle=AMBER; c.fillText('1.25× threshold',right-84,y2-4); c.restore(); } }] });
 }
 
-// ─── MARGIN CHART ────────────────────────────────────────────────────────────
 function buildMarginChart() {
   const ctx = document.getElementById('marginChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: ['2023', '2024', '2025'],
-      datasets: [
-        {
-          label: 'NOP Margin',
-          data: [26.9, 25.9, 23.8],
-          borderColor: AMBER,
-          backgroundColor: AMBER3,
-          borderWidth: 2,
-          pointBackgroundColor: AMBER,
-          fill: true,
-          tension: 0.3,
-        },
-        {
-          label: 'GOP Margin',
-          data: [
-            (annual[2023].gop/annual[2023].rev*100).toFixed(1),
-            (annual[2024].gop/annual[2024].rev*100).toFixed(1),
-            (annual[2025].gop/annual[2025].rev*100).toFixed(1),
-          ],
-          borderColor: BLUE,
-          backgroundColor: 'rgba(96,165,250,0.1)',
-          borderWidth: 2,
-          pointBackgroundColor: BLUE,
-          fill: true,
-          tension: 0.3,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { labels: { color: '#9ca3af', boxWidth: 12, padding: 12 } },
-        tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + ctx.raw + '%' } },
-      },
-      scales: {
-        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280' } },
-        y: {
-          min: 15, max: 55,
-          grid: { color: 'rgba(255,255,255,0.04)' },
-          ticks: { color: '#6b7280', callback: v => v + '%' },
-        },
-      },
-    },
-  });
+  new Chart(ctx, { type:'line', data:{ labels:['2023','2024','2025'], datasets:[
+    { label:'NOP Margin', data:[26.9,25.9,23.8], borderColor:AMBER, backgroundColor:'rgba(245,158,11,0.3)', borderWidth:2, pointBackgroundColor:AMBER, fill:true, tension:0.3 },
+    { label:'GOP Margin', data:[(annual[2023].gop/annual[2023].rev*100).toFixed(1),(annual[2024].gop/annual[2024].rev*100).toFixed(1),(annual[2025].gop/annual[2025].rev*100).toFixed(1)], borderColor:BLUE, backgroundColor:'rgba(96,165,250,0.1)', borderWidth:2, pointBackgroundColor:BLUE, fill:true, tension:0.3 },
+  ]}, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{labels:{color:'#9ca3af',boxWidth:12,padding:12}}, tooltip:{callbacks:{label:ctx=>' '+ctx.dataset.label+': '+ctx.raw+'%'}} }, scales:{ x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#6b7280'}}, y:{min:15,max:55,grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#6b7280',callback:v=>v+'%'}} } } });
 }
 
-// ─── OCCUPANCY CHART ─────────────────────────────────────────────────────────
 function buildOccChart() {
   const ctx = document.getElementById('occChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: MONTHS,
-      datasets: [
-        {
-          label: '2023',
-          data: monthly[2023].map(d => (d.occ * 100).toFixed(1)),
-          borderColor: 'rgba(96,165,250,0.7)',
-          backgroundColor: 'transparent',
-          borderWidth: 1.5,
-          pointRadius: 2,
-          tension: 0.3,
-        },
-        {
-          label: '2024',
-          data: monthly[2024].map(d => (d.occ * 100).toFixed(1)),
-          borderColor: 'rgba(167,139,250,0.8)',
-          backgroundColor: 'transparent',
-          borderWidth: 1.5,
-          pointRadius: 2,
-          tension: 0.3,
-        },
-        {
-          label: '2025',
-          data: monthly[2025].map(d => (d.occ * 100).toFixed(1)),
-          borderColor: AMBER,
-          backgroundColor: AMBER3,
-          borderWidth: 2,
-          pointRadius: 3,
-          fill: true,
-          tension: 0.3,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { labels: { color: '#9ca3af', boxWidth: 10, padding: 12 } },
-        tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + ctx.raw + '%' } },
-      },
-      scales: {
-        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280' } },
-        y: {
-          min: 50, max: 100,
-          grid: { color: 'rgba(255,255,255,0.04)' },
-          ticks: { color: '#6b7280', callback: v => v + '%' },
-        },
-      },
-    },
-  });
+  new Chart(ctx, { type:'line', data:{ labels:MONTHS, datasets:[
+    { label:'2023', data:monthly[2023].map(d=>(d.occ*100).toFixed(1)), borderColor:'rgba(96,165,250,0.7)', backgroundColor:'transparent', borderWidth:1.5, pointRadius:2, tension:0.3 },
+    { label:'2024', data:monthly[2024].map(d=>(d.occ*100).toFixed(1)), borderColor:'rgba(167,139,250,0.8)', backgroundColor:'transparent', borderWidth:1.5, pointRadius:2, tension:0.3 },
+    { label:'2025', data:monthly[2025].map(d=>(d.occ*100).toFixed(1)), borderColor:AMBER, backgroundColor:'rgba(245,158,11,0.3)', borderWidth:2, pointRadius:3, fill:true, tension:0.3 },
+  ]}, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{labels:{color:'#9ca3af',boxWidth:10,padding:12}}, tooltip:{callbacks:{label:ctx=>' '+ctx.dataset.label+': '+ctx.raw+'%'}} }, scales:{ x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#6b7280'}}, y:{min:50,max:100,grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#6b7280',callback:v=>v+'%'}} } } });
 }
 
-// ─── ADR / REVPAR CHART ──────────────────────────────────────────────────────
 function buildADRChart() {
   const ctx = document.getElementById('adrChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: MONTHS,
-      datasets: [
-        {
-          label: '2024 ADR',
-          data: monthly[2024].map(d => d.adr.toFixed(2)),
-          borderColor: 'rgba(167,139,250,0.7)',
-          backgroundColor: 'transparent',
-          borderWidth: 1.5,
-          pointRadius: 2,
-          tension: 0.3,
-        },
-        {
-          label: '2025 ADR',
-          data: monthly[2025].map(d => d.adr.toFixed(2)),
-          borderColor: AMBER,
-          backgroundColor: 'transparent',
-          borderWidth: 2,
-          pointRadius: 3,
-          tension: 0.3,
-        },
-        {
-          label: '2025 RevPAR',
-          data: monthly[2025].map(d => d.revpar.toFixed(2)),
-          borderColor: GREEN,
-          backgroundColor: 'rgba(34,197,94,0.1)',
-          borderWidth: 1.5,
-          borderDash: [4,3],
-          pointRadius: 2,
-          fill: true,
-          tension: 0.3,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { labels: { color: '#9ca3af', boxWidth: 10, padding: 12 } },
-        tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ': $' + ctx.raw } },
-      },
-      scales: {
-        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280' } },
-        y: {
-          grid: { color: 'rgba(255,255,255,0.04)' },
-          ticks: { color: '#6b7280', callback: v => '$' + v },
-        },
-      },
-    },
-  });
+  new Chart(ctx, { type:'line', data:{ labels:MONTHS, datasets:[
+    { label:'2024 ADR', data:monthly[2024].map(d=>d.adr.toFixed(2)), borderColor:'rgba(167,139,250,0.7)', backgroundColor:'transparent', borderWidth:1.5, pointRadius:2, tension:0.3 },
+    { label:'2025 ADR', data:monthly[2025].map(d=>d.adr.toFixed(2)), borderColor:AMBER, backgroundColor:'transparent', borderWidth:2, pointRadius:3, tension:0.3 },
+    { label:'2025 RevPAR', data:monthly[2025].map(d=>d.revpar.toFixed(2)), borderColor:GREEN, backgroundColor:'rgba(34,197,94,0.1)', borderWidth:1.5, borderDash:[4,3], pointRadius:2, fill:true, tension:0.3 },
+  ]}, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{labels:{color:'#9ca3af',boxWidth:10,padding:12}}, tooltip:{callbacks:{label:ctx=>' '+ctx.dataset.label+': $'+ctx.raw}} }, scales:{ x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#6b7280'}}, y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#6b7280',callback:v=>'$'+v}} } } });
 }
 
-// ─── YoY TABLE ───────────────────────────────────────────────────────────────
 function buildYoYTable() {
   const tbody = document.getElementById('yoy-tbody');
-  const rows = MONTHS.map((m, i) => {
-    const d24 = monthly[2024][i];
-    const d25 = monthly[2025][i];
-    const revDelta = d25.rev - d24.rev;
-    const revDeltaPct = (revDelta / d24.rev) * 100;
-    const nopDeltaPct = d24.nop > 0 ? ((d25.nop - d24.nop) / d24.nop) * 100 : null;
-    const revClass = revDeltaPct >= 0 ? 'pos' : 'neg';
-    const nopClass = nopDeltaPct === null ? 'neu' : (nopDeltaPct >= 0 ? 'pos' : 'neg');
-
-    return `<tr>
-      <td>${m}</td>
-      <td>${fmt$(d24.rev)}</td>
-      <td>${fmt$(d25.rev)}</td>
-      <td class="${revClass}">${revDelta >= 0 ? '+' : ''}${fmt$(revDelta)}</td>
-      <td class="${revClass}">${revDeltaPct >= 0 ? '+' : ''}${revDeltaPct.toFixed(1)}%</td>
-      <td>${fmt$(d24.nop)}</td>
-      <td>${fmt$(d25.nop)}</td>
-      <td class="${nopClass}">${nopDeltaPct !== null ? (nopDeltaPct >= 0 ? '+' : '') + nopDeltaPct.toFixed(1) + '%' : '—'}</td>
-    </tr>`;
-  });
-  tbody.innerHTML = rows.join('');
+  tbody.innerHTML = MONTHS.map((m, i) => {
+    const d24=monthly[2024][i], d25=monthly[2025][i];
+    const revDelta=d25.rev-d24.rev, revDeltaPct=(revDelta/d24.rev)*100;
+    const nopDeltaPct=d24.nop>0?((d25.nop-d24.nop)/d24.nop)*100:null;
+    const revClass=revDeltaPct>=0?'pos':'neg', nopClass=nopDeltaPct===null?'neu':(nopDeltaPct>=0?'pos':'neg');
+    return `<tr><td>${m}</td><td>${fmt$(d24.rev)}</td><td>${fmt$(d25.rev)}</td><td class="${revClass}">${revDelta>=0?'+':''}${fmt$(revDelta)}</td><td class="${revClass}">${revDeltaPct>=0?'+':''}${revDeltaPct.toFixed(1)}%</td><td>${fmt$(d24.nop)}</td><td>${fmt$(d25.nop)}</td><td class="${nopClass}">${nopDeltaPct!==null?(nopDeltaPct>=0?'+':'')+nopDeltaPct.toFixed(1)+'%':'—'}</td></tr>`;
+  }).join('');
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// ─── STR PERFORMANCE DATA & CHARTS ──────────────────────────────────────────
+// STR PERFORMANCE — UPGRADED IMPLEMENTATION
+// Data source: STR_DATA (from str-data.js)
 // ═══════════════════════════════════════════════════════════════════════════════
 
-// Weekly STAR data — 93 weeks, Jan 2024–Mar 2026
-const strWeekly = [
-  { w:'2024-01-07', yr:2024, mo:'Jan', occ:79.4, occC:72.4, mpi:109.6, adr:162.71, adrC:147.62, ari:110.2, revpar:129.14, revparC:106.88, rgi:120.8 },
-  { w:'2024-01-14', yr:2024, mo:'Jan', occ:81.4, occC:77.6, mpi:104.9, adr:160.68, adrC:148.28, ari:108.4, revpar:130.80, revparC:115.05, rgi:113.7 },
-  { w:'2024-01-21', yr:2024, mo:'Jan', occ:87.9, occC:83.2, mpi:105.6, adr:181.39, adrC:157.64, ari:115.1, revpar:159.38, revparC:131.15, rgi:121.5 },
-  { w:'2024-01-28', yr:2024, mo:'Jan', occ:85.4, occC:87.0, mpi:98.2,  adr:201.98, adrC:175.33, ari:115.2, revpar:172.44, revparC:152.47, rgi:113.1 },
-  { w:'2024-02-04', yr:2024, mo:'Feb', occ:83.7, occC:75.7, mpi:110.6, adr:193.84, adrC:161.76, ari:119.8, revpar:162.19, revparC:122.39, rgi:132.5 },
-  { w:'2024-02-11', yr:2024, mo:'Feb', occ:79.6, occC:82.7, mpi:96.3,  adr:191.48, adrC:183.04, ari:104.6, revpar:152.41, revparC:151.29, rgi:100.7 },
-  { w:'2024-02-18', yr:2024, mo:'Feb', occ:90.2, occC:91.3, mpi:98.8,  adr:207.88, adrC:191.99, ari:108.3, revpar:187.61, revparC:175.36, rgi:107.0 },
-  { w:'2024-02-25', yr:2024, mo:'Feb', occ:96.8, occC:91.2, mpi:106.2, adr:217.30, adrC:195.10, ari:111.4, revpar:210.40, revparC:177.87, rgi:118.3 },
-  { w:'2024-03-03', yr:2024, mo:'Mar', occ:82.2, occC:85.5, mpi:96.1,  adr:229.02, adrC:205.66, ari:111.4, revpar:188.25, revparC:175.88, rgi:107.0 },
-  { w:'2024-03-10', yr:2024, mo:'Mar', occ:91.5, occC:91.5, mpi:100.0, adr:216.80, adrC:199.51, ari:108.7, revpar:198.37, revparC:182.53, rgi:108.7 },
-  { w:'2024-03-17', yr:2024, mo:'Mar', occ:88.7, occC:83.9, mpi:105.7, adr:204.77, adrC:187.66, ari:109.1, revpar:181.55, revparC:157.36, rgi:115.4 },
-  { w:'2024-03-24', yr:2024, mo:'Mar', occ:75.8, occC:65.8, mpi:115.2, adr:168.65, adrC:145.38, ari:116.0, revpar:127.92, revparC:95.74,  rgi:133.6 },
-  { w:'2024-03-31', yr:2024, mo:'Mar', occ:80.2, occC:79.1, mpi:101.4, adr:239.35, adrC:202.99, ari:117.9, revpar:191.86, revparC:160.54, rgi:119.5 },
-  { w:'2024-04-07', yr:2024, mo:'Apr', occ:77.5, occC:91.8, mpi:84.5,  adr:362.11, adrC:305.51, ari:118.5, revpar:280.82, revparC:280.55, rgi:100.1 },
-  { w:'2024-04-14', yr:2024, mo:'Apr', occ:88.4, occC:75.8, mpi:116.7, adr:224.37, adrC:187.91, ari:119.4, revpar:198.42, revparC:142.37, rgi:139.4 },
-  { w:'2024-04-21', yr:2024, mo:'Apr', occ:83.7, occC:75.3, mpi:111.2, adr:191.89, adrC:159.69, ari:120.2, revpar:160.56, revparC:120.19, rgi:133.6 },
-  { w:'2024-04-28', yr:2024, mo:'Apr', occ:76.1, occC:66.8, mpi:113.9, adr:178.61, adrC:147.56, ari:121.0, revpar:135.88, revparC:98.54,  rgi:137.9 },
-  { w:'2024-05-05', yr:2024, mo:'May', occ:73.9, occC:65.7, mpi:112.5, adr:185.95, adrC:150.16, ari:123.8, revpar:137.46, revparC:98.66,  rgi:139.3 },
-  { w:'2024-05-12', yr:2024, mo:'May', occ:76.2, occC:60.2, mpi:126.5, adr:160.77, adrC:142.55, ari:112.8, revpar:122.49, revparC:85.85,  rgi:142.7 },
-  { w:'2024-05-19', yr:2024, mo:'May', occ:76.1, occC:64.6, mpi:117.8, adr:160.58, adrC:133.99, ari:119.8, revpar:122.17, revparC:86.53,  rgi:141.2 },
-  { w:'2024-05-26', yr:2024, mo:'May', occ:73.0, occC:54.9, mpi:132.9, adr:159.12, adrC:142.75, ari:111.5, revpar:116.18, revparC:78.43,  rgi:148.1 },
-  { w:'2024-06-02', yr:2024, mo:'Jun', occ:80.5, occC:77.5, mpi:103.8, adr:179.21, adrC:147.41, ari:121.6, revpar:144.26, revparC:114.31, rgi:126.2 },
-  { w:'2024-06-09', yr:2024, mo:'Jun', occ:69.5, occC:65.7, mpi:105.8, adr:151.84, adrC:135.15, ari:112.3, revpar:105.53, revparC:88.77,  rgi:118.9 },
-  { w:'2024-06-16', yr:2024, mo:'Jun', occ:83.0, occC:83.6, mpi:99.3,  adr:173.87, adrC:153.57, ari:113.2, revpar:144.30, revparC:128.36, rgi:112.4 },
-  { w:'2024-06-23', yr:2024, mo:'Jun', occ:93.1, occC:72.2, mpi:128.9, adr:177.96, adrC:141.42, ari:125.8, revpar:165.65, revparC:102.16, rgi:162.2 },
-  { w:'2024-07-07', yr:2024, mo:'Jul', occ:79.2, occC:62.5, mpi:126.8, adr:148.33, adrC:123.96, ari:119.7, revpar:117.56, revparC:77.51,  rgi:151.7 },
-  { w:'2024-07-14', yr:2024, mo:'Jul', occ:81.9, occC:66.6, mpi:122.9, adr:148.50, adrC:125.77, ari:118.1, revpar:121.56, revparC:83.78,  rgi:145.1 },
-  { w:'2024-07-21', yr:2024, mo:'Jul', occ:71.8, occC:61.9, mpi:116.0, adr:148.57, adrC:128.30, ari:115.8, revpar:106.63, revparC:79.40,  rgi:134.3 },
-  { w:'2024-07-28', yr:2024, mo:'Jul', occ:57.0, occC:49.5, mpi:115.2, adr:134.52, adrC:123.11, ari:109.3, revpar:76.72,  revparC:60.95,  rgi:125.9 },
-  { w:'2024-08-04', yr:2024, mo:'Aug', occ:58.8, occC:52.5, mpi:112.0, adr:140.33, adrC:118.51, ari:118.4, revpar:82.58,  revparC:62.27,  rgi:132.6 },
-  { w:'2024-08-11', yr:2024, mo:'Aug', occ:85.6, occC:67.9, mpi:126.0, adr:158.86, adrC:126.45, ari:125.6, revpar:135.98, revparC:85.90,  rgi:158.3 },
-  { w:'2024-08-18', yr:2024, mo:'Aug', occ:73.6, occC:52.5, mpi:140.2, adr:137.72, adrC:119.68, ari:115.1, revpar:101.34, revparC:62.83,  rgi:161.3 },
-  { w:'2024-09-01', yr:2024, mo:'Sep', occ:73.5, occC:44.9, mpi:163.5, adr:133.44, adrC:116.67, ari:114.4, revpar:98.04,  revparC:52.43,  rgi:187.0 },
-  { w:'2024-09-08', yr:2024, mo:'Sep', occ:77.4, occC:65.3, mpi:118.7, adr:150.80, adrC:125.34, ari:120.3, revpar:116.77, revparC:81.80,  rgi:142.7 },
-  { w:'2024-09-15', yr:2024, mo:'Sep', occ:86.4, occC:67.1, mpi:128.8, adr:152.26, adrC:125.76, ari:121.1, revpar:131.55, revparC:84.39,  rgi:155.9 },
-  { w:'2024-09-22', yr:2024, mo:'Sep', occ:85.0, occC:78.2, mpi:108.8, adr:150.07, adrC:132.86, ari:113.0, revpar:127.61, revparC:103.87, rgi:122.9 },
-  { w:'2024-09-29', yr:2024, mo:'Sep', occ:94.1, occC:85.4, mpi:110.2, adr:160.90, adrC:140.35, ari:114.6, revpar:151.41, revparC:119.89, rgi:126.3 },
-  { w:'2024-10-06', yr:2024, mo:'Oct', occ:78.9, occC:76.3, mpi:103.5, adr:166.34, adrC:152.61, ari:109.0, revpar:131.26, revparC:116.40, rgi:112.8 },
-  { w:'2024-10-13', yr:2024, mo:'Oct', occ:98.6, occC:90.0, mpi:109.5, adr:179.35, adrC:160.90, ari:111.5, revpar:176.91, revparC:144.90, rgi:122.1 },
-  { w:'2024-10-20', yr:2024, mo:'Oct', occ:96.4, occC:86.3, mpi:111.6, adr:181.01, adrC:158.20, ari:114.4, revpar:174.44, revparC:136.57, rgi:127.7 },
-  { w:'2024-10-27', yr:2024, mo:'Oct', occ:81.1, occC:81.2, mpi:99.8,  adr:156.11, adrC:143.82, ari:108.5, revpar:126.58, revparC:116.80, rgi:108.4 },
-  { w:'2024-11-10', yr:2024, mo:'Nov', occ:93.9, occC:89.7, mpi:104.6, adr:158.89, adrC:144.30, ari:110.1, revpar:149.17, revparC:129.46, rgi:115.2 },
-  { w:'2024-11-17', yr:2024, mo:'Nov', occ:90.6, occC:82.3, mpi:110.0, adr:157.46, adrC:140.92, ari:111.7, revpar:142.64, revparC:116.03, rgi:122.9 },
-  { w:'2024-11-24', yr:2024, mo:'Nov', occ:59.3, occC:58.2, mpi:101.8, adr:125.01, adrC:120.46, ari:103.8, revpar:74.13,  revparC:70.16,  rgi:105.7 },
-  { w:'2024-12-01', yr:2024, mo:'Dec', occ:87.1, occC:86.8, mpi:100.3, adr:180.91, adrC:149.64, ari:120.9, revpar:157.52, revparC:129.97, rgi:121.2 },
-  { w:'2024-12-08', yr:2024, mo:'Dec', occ:89.1, occC:90.0, mpi:99.0,  adr:195.44, adrC:158.15, ari:123.6, revpar:174.17, revparC:142.37, rgi:122.3 },
-  { w:'2024-12-15', yr:2024, mo:'Dec', occ:72.1, occC:70.4, mpi:102.5, adr:132.31, adrC:131.79, ari:100.4, revpar:95.41,  revparC:92.75,  rgi:102.9 },
-  { w:'2024-12-29', yr:2024, mo:'Dec', occ:75.3, occC:55.8, mpi:134.9, adr:126.19, adrC:123.04, ari:102.6, revpar:95.00,  revparC:68.68,  rgi:138.3 },
-  { w:'2025-01-05', yr:2025, mo:'Jan', occ:72.8, occC:73.4, mpi:99.2,  adr:155.50, adrC:143.06, ari:108.7, revpar:113.18, revparC:104.99, rgi:107.8 },
-  { w:'2025-01-19', yr:2025, mo:'Jan', occ:87.1, occC:88.3, mpi:98.6,  adr:181.15, adrC:163.41, ari:110.9, revpar:157.74, revparC:144.26, rgi:109.3 },
-  { w:'2025-02-02', yr:2025, mo:'Feb', occ:87.9, occC:83.5, mpi:105.2, adr:211.67, adrC:180.04, ari:117.6, revpar:185.99, revparC:150.36, rgi:123.7 },
-  { w:'2025-02-09', yr:2025, mo:'Feb', occ:93.8, occC:88.1, mpi:106.4, adr:206.26, adrC:196.25, ari:105.1, revpar:193.40, revparC:172.87, rgi:111.9 },
-  { w:'2025-02-16', yr:2025, mo:'Feb', occ:94.3, occC:91.1, mpi:103.5, adr:217.53, adrC:201.89, ari:107.7, revpar:205.20, revparC:184.02, rgi:111.5 },
-  { w:'2025-03-02', yr:2025, mo:'Mar', occ:91.2, occC:90.7, mpi:100.5, adr:223.00, adrC:214.49, ari:104.0, revpar:203.28, revparC:194.60, rgi:104.5 },
-  { w:'2025-03-09', yr:2025, mo:'Mar', occ:96.8, occC:92.0, mpi:105.2, adr:214.21, adrC:199.81, ari:107.2, revpar:207.41, revparC:183.88, rgi:112.8 },
-  { w:'2025-03-30', yr:2025, mo:'Mar', occ:89.2, occC:91.0, mpi:98.0,  adr:363.39, adrC:309.50, ari:117.4, revpar:324.25, revparC:281.71, rgi:115.1 },
-  { w:'2025-04-06', yr:2025, mo:'Apr', occ:82.1, occC:80.9, mpi:101.4, adr:222.22, adrC:181.47, ari:122.5, revpar:182.41, revparC:146.84, rgi:124.2 },
-  { w:'2025-04-13', yr:2025, mo:'Apr', occ:65.8, occC:56.1, mpi:117.3, adr:166.49, adrC:131.36, ari:126.7, revpar:109.48, revparC:73.65,  rgi:148.7 },
-  { w:'2025-04-20', yr:2025, mo:'Apr', occ:81.9, occC:74.9, mpi:109.2, adr:183.67, adrC:160.54, ari:114.4, revpar:150.35, revparC:120.32, rgi:125.0 },
-  { w:'2025-05-11', yr:2025, mo:'May', occ:84.2, occC:77.4, mpi:108.9, adr:174.46, adrC:140.61, ari:124.1, revpar:146.97, revparC:108.77, rgi:135.1 },
-  { w:'2025-05-18', yr:2025, mo:'May', occ:82.5, occC:69.9, mpi:118.1, adr:155.18, adrC:128.53, ari:120.7, revpar:128.09, revparC:89.86,  rgi:142.5 },
-  { w:'2025-06-01', yr:2025, mo:'Jun', occ:81.5, occC:74.6, mpi:109.3, adr:170.42, adrC:143.88, ari:118.4, revpar:138.93, revparC:107.35, rgi:129.4 },
-  { w:'2025-06-08', yr:2025, mo:'Jun', occ:70.0, occC:61.0, mpi:114.7, adr:150.22, adrC:124.00, ari:121.1, revpar:105.09, revparC:75.62,  rgi:139.0 },
-  { w:'2025-06-15', yr:2025, mo:'Jun', occ:69.5, occC:66.8, mpi:104.0, adr:149.71, adrC:124.52, ari:120.2, revpar:104.05, revparC:83.22,  rgi:125.0 },
-  { w:'2025-06-22', yr:2025, mo:'Jun', occ:90.5, occC:77.4, mpi:116.9, adr:182.27, adrC:132.53, ari:137.5, revpar:164.91, revparC:102.57, rgi:160.8 },
-  { w:'2025-06-29', yr:2025, mo:'Jun', occ:49.4, occC:46.7, mpi:105.9, adr:126.37, adrC:113.20, ari:111.6, revpar:62.47,  revparC:52.86,  rgi:118.2 },
-  { w:'2025-07-06', yr:2025, mo:'Jul', occ:64.0, occC:59.5, mpi:107.5, adr:141.17, adrC:119.52, ari:118.1, revpar:90.27,  revparC:71.07,  rgi:127.0 },
-  { w:'2025-07-13', yr:2025, mo:'Jul', occ:73.7, occC:62.6, mpi:117.7, adr:151.81, adrC:117.32, ari:129.4, revpar:111.88, revparC:73.47,  rgi:152.3 },
-  { w:'2025-07-27', yr:2025, mo:'Jul', occ:71.0, occC:61.7, mpi:115.1, adr:137.90, adrC:115.13, ari:119.8, revpar:97.88,  revparC:71.00,  rgi:137.9 },
-  { w:'2025-08-03', yr:2025, mo:'Aug', occ:75.3, occC:56.6, mpi:132.9, adr:144.68, adrC:116.70, ari:124.0, revpar:108.92, revparC:66.11,  rgi:164.8 },
-  { w:'2025-08-10', yr:2025, mo:'Aug', occ:74.9, occC:57.0, mpi:131.4, adr:136.51, adrC:116.04, ari:117.6, revpar:102.31, revparC:66.19,  rgi:154.6 },
-  { w:'2025-08-31', yr:2025, mo:'Aug', occ:58.4, occC:56.3, mpi:103.7, adr:140.65, adrC:121.66, ari:115.6, revpar:82.13,  revparC:68.48,  rgi:119.9 },
-  { w:'2025-09-07', yr:2025, mo:'Sep', occ:73.9, occC:66.3, mpi:111.5, adr:141.20, adrC:121.67, ari:116.1, revpar:104.38, revparC:80.68,  rgi:129.4 },
-  { w:'2025-09-21', yr:2025, mo:'Sep', occ:78.2, occC:60.5, mpi:129.4, adr:137.86, adrC:122.34, ari:112.7, revpar:107.85, revparC:73.98,  rgi:145.8 },
-  { w:'2025-10-05', yr:2025, mo:'Oct', occ:74.3, occC:63.5, mpi:117.0, adr:150.64, adrC:128.67, ari:117.1, revpar:111.87, revparC:81.65,  rgi:137.0 },
-  { w:'2025-10-12', yr:2025, mo:'Oct', occ:83.9, occC:71.9, mpi:116.7, adr:165.18, adrC:138.71, ari:119.1, revpar:138.59, revparC:99.72,  rgi:139.0 },
-  { w:'2025-10-19', yr:2025, mo:'Oct', occ:89.1, occC:67.7, mpi:131.7, adr:149.81, adrC:126.54, ari:118.4, revpar:133.50, revparC:85.62,  rgi:155.9 },
-  { w:'2025-10-26', yr:2025, mo:'Oct', occ:74.7, occC:68.0, mpi:109.8, adr:170.49, adrC:146.92, ari:116.0, revpar:127.38, revparC:99.98,  rgi:127.4 },
-  { w:'2025-11-02', yr:2025, mo:'Nov', occ:88.1, occC:69.4, mpi:127.0, adr:176.73, adrC:138.28, ari:127.8, revpar:155.70, revparC:95.94,  rgi:162.3 },
-  { w:'2025-11-09', yr:2025, mo:'Nov', occ:83.5, occC:72.6, mpi:115.0, adr:182.57, adrC:138.54, ari:131.8, revpar:152.35, revparC:100.56, rgi:151.5 },
-  { w:'2025-11-16', yr:2025, mo:'Nov', occ:78.7, occC:76.1, mpi:103.4, adr:173.62, adrC:137.56, ari:126.2, revpar:136.62, revparC:104.65, rgi:130.5 },
-  { w:'2025-11-23', yr:2025, mo:'Nov', occ:46.5, occC:48.6, mpi:95.7,  adr:123.66, adrC:113.64, ari:108.8, revpar:57.48,  revparC:55.21,  rgi:104.1 },
-  { w:'2025-11-30', yr:2025, mo:'Nov', occ:70.3, occC:75.6, mpi:92.9,  adr:163.42, adrC:131.68, ari:124.1, revpar:114.87, revparC:99.60,  rgi:115.3 },
-  { w:'2025-12-21', yr:2025, mo:'Dec', occ:49.9, occC:52.6, mpi:94.8,  adr:118.64, adrC:101.08, ari:117.4, revpar:59.19,  revparC:53.21,  rgi:111.2 },
-  { w:'2026-01-04', yr:2026, mo:'Jan', occ:81.8, occC:72.2, mpi:113.2, adr:156.72, adrC:131.73, ari:119.0, revpar:128.12, revparC:95.16,  rgi:134.6 },
-  { w:'2026-01-11', yr:2026, mo:'Jan', occ:85.2, occC:82.7, mpi:102.9, adr:189.36, adrC:153.12, ari:123.7, revpar:161.23, revparC:126.68, rgi:127.3 },
-  { w:'2026-01-18', yr:2026, mo:'Jan', occ:89.5, occC:84.1, mpi:106.3, adr:198.76, adrC:170.99, ari:116.2, revpar:177.80, revparC:143.84, rgi:123.6 },
-  { w:'2026-01-25', yr:2026, mo:'Jan', occ:84.7, occC:71.9, mpi:117.8, adr:184.08, adrC:155.61, ari:118.3, revpar:155.91, revparC:111.87, rgi:139.4 },
-  { w:'2026-02-08', yr:2026, mo:'Feb', occ:84.7, occC:87.0, mpi:97.4,  adr:238.13, adrC:197.86, ari:120.4, revpar:201.68, revparC:172.11, rgi:117.2 },
-  { w:'2026-02-22', yr:2026, mo:'Feb', occ:92.7, occC:90.3, mpi:102.7, adr:235.63, adrC:205.43, ari:114.7, revpar:218.53, revparC:185.48, rgi:117.8 },
-  { w:'2026-03-01', yr:2026, mo:'Mar', occ:95.9, occC:89.3, mpi:107.5, adr:229.79, adrC:202.73, ari:113.3, revpar:220.41, revparC:180.96, rgi:121.8 },
-  { w:'2026-03-08', yr:2026, mo:'Mar', occ:87.3, occC:89.6, mpi:97.4,  adr:224.25, adrC:201.84, ari:111.1, revpar:195.77, revparC:180.85, rgi:108.3 },
-  { w:'2026-03-15', yr:2026, mo:'Mar', occ:95.6, occC:89.9, mpi:106.3, adr:219.38, adrC:188.60, ari:116.3, revpar:209.68, revparC:169.50, rgi:123.7 },
-];
-
-// Monthly STAR data
-const strMonthly = [
-  { p:'2024-01', occ:76.7, occC:74.0, mpi:103.7, adr:165.93, adrC:149.57, ari:110.9, revpar:127.31, revparC:110.68, rgi:115.0 },
-  { p:'2024-02', occ:87.6, occC:84.8, mpi:103.3, adr:202.11, adrC:181.97, ari:111.1, revpar:177.06, revparC:154.36, rgi:114.7 },
-  { p:'2024-03', occ:84.0, occC:81.3, mpi:103.3, adr:208.07, adrC:189.62, ari:109.7, revpar:174.78, revparC:154.21, rgi:113.3 },
-  { p:'2024-04', occ:83.2, occC:79.5, mpi:104.7, adr:245.82, adrC:213.09, ari:115.4, revpar:204.39, revparC:169.30, rgi:120.7 },
-  { p:'2024-05', occ:75.0, occC:62.9, mpi:119.3, adr:170.19, adrC:144.85, ari:117.5, revpar:127.58, revparC:91.04,  rgi:140.1 },
-  { p:'2024-06', occ:79.6, occC:73.0, mpi:109.0, adr:170.79, adrC:144.47, ari:118.2, revpar:135.95, revparC:105.52, rgi:128.8 },
-  { p:'2024-07', occ:68.1, occC:56.5, mpi:120.6, adr:145.10, adrC:124.35, ari:116.7, revpar:98.81,  revparC:70.19,  rgi:140.8 },
-  { p:'2024-08', occ:70.8, occC:54.6, mpi:129.6, adr:142.80, adrC:121.28, ari:117.7, revpar:101.05, revparC:66.24,  rgi:152.6 },
-  { p:'2024-09', occ:83.3, occC:68.2, mpi:122.2, adr:149.49, adrC:128.20, ari:116.6, revpar:125.08, revparC:88.48,  rgi:141.4 },
-  { p:'2024-10', occ:90.8, occC:83.2, mpi:109.2, adr:171.25, adrC:157.24, ari:108.9, revpar:155.47, revparC:130.75, rgi:118.9 },
-  { p:'2024-11', occ:83.9, occC:80.6, mpi:104.1, adr:157.48, adrC:141.22, ari:111.5, revpar:132.19, revparC:113.84, rgi:116.1 },
-  { p:'2024-12', occ:80.4, occC:76.1, mpi:105.7, adr:156.61, adrC:140.12, ari:111.8, revpar:125.90, revparC:106.58, rgi:118.1 },
-  { p:'2025-01', occ:82.6, occC:81.5, mpi:101.3, adr:173.49, adrC:157.31, ari:110.3, revpar:143.29, revparC:128.24, rgi:111.7 },
-  { p:'2025-02', occ:92.0, occC:87.6, mpi:105.0, adr:211.82, adrC:192.73, ari:109.9, revpar:194.86, revparC:169.08, rgi:115.2 },
-  { p:'2025-03', occ:92.7, occC:85.5, mpi:108.5, adr:217.60, adrC:203.25, ari:107.1, revpar:201.72, revparC:173.67, rgi:116.2 },
-  { p:'2025-04', occ:76.6, occC:70.6, mpi:108.4, adr:190.79, adrC:157.79, ari:120.9, revpar:147.41, revparC:113.60, rgi:129.8 },
-  { p:'2025-05', occ:79.9, occC:70.2, mpi:113.9, adr:170.69, adrC:141.08, ari:121.0, revpar:136.43, revparC:99.00,  rgi:137.8 },
-  { p:'2025-06', occ:76.2, occC:68.4, mpi:111.4, adr:163.00, adrC:131.27, ari:124.2, revpar:124.28, revparC:89.83,  rgi:138.3 },
-  { p:'2025-07', occ:66.6, occC:58.1, mpi:114.6, adr:141.94, adrC:117.04, ari:121.3, revpar:94.55,  revparC:68.01,  rgi:139.0 },
-  { p:'2025-08', occ:78.6, occC:65.8, mpi:119.5, adr:148.55, adrC:120.71, ari:123.1, revpar:116.72, revparC:79.39,  rgi:147.0 },
-  { p:'2025-09', occ:70.0, occC:59.2, mpi:118.2, adr:136.88, adrC:120.78, ari:113.3, revpar:95.78,  revparC:71.48,  rgi:134.0 },
-  { p:'2025-10', occ:80.5, occC:67.5, mpi:119.4, adr:156.88, adrC:134.83, ari:116.3, revpar:126.35, revparC:90.97,  rgi:138.9 },
-  { p:'2025-11', occ:73.4, occC:68.5, mpi:107.2, adr:164.00, adrC:131.94, ari:124.3, revpar:123.40, revparC:91.19,  rgi:135.3 },
-  { p:'2025-12', occ:49.9, occC:52.6, mpi:94.8,  adr:118.64, adrC:101.08, ari:117.4, revpar:59.19,  revparC:53.21,  rgi:111.2 },
-  { p:'2026-01', occ:85.3, occC:77.7, mpi:109.7, adr:182.23, adrC:152.86, ari:119.2, revpar:155.76, revparC:119.39, rgi:130.5 },
-  { p:'2026-02', occ:88.7, occC:88.6, mpi:100.1, adr:236.88, adrC:201.65, ari:117.5, revpar:210.11, revparC:178.80, rgi:117.5 },
-  { p:'2026-03', occ:92.9, occC:89.6, mpi:103.7, adr:224.47, adrC:197.72, ari:113.5, revpar:208.62, revparC:177.10, rgi:117.8 },
-];
-
-// YoY RevPAR data
-const strYoY = {
-  months: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
-  revpar2024: [127.31,177.06,174.78,204.39,127.58,135.95,98.81,101.05,125.08,155.47,132.19,125.90],
-  revpar2025: [143.29,194.86,201.72,147.41,136.43,124.28,94.55,116.72,95.78,126.35,123.40,59.19],
-  revpar2026: [155.76,210.11,208.62,null,null,null,null,null,null,null,null,null],
-};
-
-// Trailing 12 month summary
-const strT12 = { occ:76.6, occC:69.7, mpiIdx:110.1, adr:169.58, adrC:142.40, ariIdx:119.3, revpar:133.22, revparC:102.66, rgi:131.4 };
-
-// Latest week
-const strLatest = strWeekly[strWeekly.length - 1];
-
-// Best/Worst
-const strBest = [
-  { w:'2024-09-01', occ:73.5, adr:133.44, revpar:98.04,  rgi:187.0 },
-  { w:'2025-08-03', occ:75.3, adr:144.68, revpar:108.92, rgi:164.8 },
-  { w:'2025-11-02', occ:88.1, adr:176.73, revpar:155.70, rgi:162.3 },
-  { w:'2024-06-23', occ:93.1, adr:177.96, revpar:165.65, rgi:162.2 },
-  { w:'2024-08-18', occ:73.6, adr:137.72, revpar:101.34, rgi:161.3 },
-];
-const strWorst = [
-  { w:'2025-03-02', occ:91.2, adr:223.00, revpar:203.28, rgi:104.5 },
-  { w:'2025-11-23', occ:46.5, adr:123.66, revpar:57.48,  rgi:104.1 },
-  { w:'2024-12-15', occ:72.1, adr:132.31, revpar:95.41,  rgi:102.9 },
-  { w:'2024-02-11', occ:79.6, adr:191.48, revpar:152.41, rgi:100.7 },
-  { w:'2024-04-07', occ:77.5, adr:362.11, revpar:280.82, rgi:100.1 },
-];
-
-// ─── BUILD STR DASHBOARD ─────────────────────────────────────────────────────
 function buildSTRDashboard() {
-  buildSTRKPIs();
-  buildSTRT12KPIs();
-  buildSTRRevparChart();
-  buildSTRRgiChart();
-  buildSTROccAdrChart();
-  buildSTRYoyChart();
-  buildSTRBestWorst();
-  buildSTRMonthlyTable();
+  buildSparklines();
+  buildInsightsEngine();
+  buildRevPARTrendChart();
+  buildRGICompetitiveDominanceChart();
+  buildIndexDecompositionChart();
+  buildSeasonalHeatmap();
+  buildRecordsSection();
+  buildBestWorstTables();
+  buildMonthlyDataTable();
 }
 
-function buildSTRKPIs() {
-  const lw = strLatest;
-  const cards = [
-    {
-      label: 'Occupancy %',
-      value: lw.occ.toFixed(1) + '%',
-      index: lw.mpi.toFixed(1),
-      indexLabel: 'MPI (Occ Index)',
-      sub: 'Comp: ' + lw.occC.toFixed(1) + '%',
-      above: lw.mpi >= 100,
-    },
-    {
-      label: 'ADR',
-      value: '$' + lw.adr.toFixed(2),
-      index: lw.ari.toFixed(1),
-      indexLabel: 'ARI (ADR Index)',
-      sub: 'Comp: $' + lw.adrC.toFixed(2),
-      above: lw.ari >= 100,
-    },
-    {
-      label: 'RevPAR',
-      value: '$' + lw.revpar.toFixed(2),
-      index: (lw.revpar / lw.revparC * 100).toFixed(1),
-      indexLabel: 'vs Comp Set',
-      sub: 'Comp: $' + lw.revparC.toFixed(2),
-      above: lw.revpar >= lw.revparC,
-    },
-    {
-      label: 'RGI',
-      value: lw.rgi.toFixed(1),
-      index: lw.rgi >= 100 ? '+' + (lw.rgi - 100).toFixed(1) + ' pts above parity' : (lw.rgi - 100).toFixed(1) + ' pts below parity',
-      indexLabel: 'vs 100 baseline',
-      sub: 'Avg all-time: 128.8',
-      above: lw.rgi >= 100,
-      amber: true,
-    },
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
+
+function getSeason(month) {
+  const peakMonths = STR_DATA.meta.seasonMap.peak;
+  const troughMonths = STR_DATA.meta.seasonMap.trough;
+  if (peakMonths.includes(month)) return 'peak';
+  if (troughMonths.includes(month)) return 'trough';
+  return 'shoulder';
+}
+
+function computeRollingAvg(data, window) {
+  return data.map((val, i) => {
+    if (val === null) return null;
+    const slice = data.slice(Math.max(0, i - window + 1), i + 1).filter(v => v !== null);
+    if (slice.length === 0) return null;
+    return slice.reduce((a, b) => a + b, 0) / slice.length;
+  });
+}
+
+function heatmapColor(val, min, max) {
+  if (val === null) return 'rgba(255,255,255,0.03)';
+  const t = Math.max(0, Math.min(1, (val - min) / (max - min)));
+  if (t < 0.5) {
+    const tt = t * 2;
+    const r = Math.round(0x1e + (0x60 - 0x1e) * tt);
+    const g = Math.round(0x3a + (0xa5 - 0x3a) * tt);
+    const b = Math.round(0x5f + (0xfa - 0x5f) * tt);
+    return `rgb(${r},${g},${b})`;
+  } else {
+    const tt = (t - 0.5) * 2;
+    const r = Math.round(0x60 + (0x4a - 0x60) * tt);
+    const g = Math.round(0xa5 + (0xde - 0xa5) * tt);
+    const b = Math.round(0xfa + (0x80 - 0xfa) * tt);
+    return `rgb(${r},${g},${b})`;
+  }
+}
+
+function textColorForBg(hexOrRgb) {
+  // For our gradient, dark bg = light text, light bg = dark text
+  return '#fff';
+}
+
+// ─── A. SPARKLINES ────────────────────────────────────────────────────────────
+function buildSparklines() {
+  const weekly = STR_DATA.weekly;
+  const last13 = weekly.slice(-13);
+
+  const rgiVals = last13.map(w => w.rgi);
+  const revparVals = last13.map(w => w.revparProp);
+  const ariVals = last13.map(w => w.ari);
+
+  // Compute 13-week avg for RGI delta
+  const rgiAvg13 = rgiVals.reduce((a, b) => a + b, 0) / rgiVals.length;
+  const latestRGI = rgiVals[rgiVals.length - 1];
+  const rgiDelta = latestRGI - rgiAvg13;
+  const rgiDeltaEl = document.getElementById('hero-rgi-delta');
+  rgiDeltaEl.className = 'str-hero-delta ' + (rgiDelta >= 0 ? 'pos' : 'neg');
+  rgiDeltaEl.textContent = (rgiDelta >= 0 ? '▲ +' : '▼ ') + Math.abs(rgiDelta).toFixed(1) + ' pts vs 13wk avg';
+
+  // YoY RevPAR delta - compare to same week last year
+  const latestWeek = weekly[weekly.length - 1];
+  const lyWeek = weekly.find(w => w.weekStart === '2025-03-15');
+  if (lyWeek) {
+    const yoyDelta = ((latestWeek.revparProp / lyWeek.revparProp) - 1) * 100;
+    const revparDeltaEl = document.getElementById('hero-revpar-delta');
+    revparDeltaEl.className = 'str-hero-delta ' + (yoyDelta >= 0 ? 'pos' : 'neg');
+    revparDeltaEl.textContent = (yoyDelta >= 0 ? '▲ +' : '▼ ') + Math.abs(yoyDelta).toFixed(1) + '% vs same wk LY';
+  }
+
+  // Build sparklines using Chart.js inline
+  function buildSparkline(canvasId, data, color) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    canvas.width = canvas.parentElement.offsetWidth || 200;
+    canvas.height = 40;
+    new Chart(canvas, {
+      type: 'line',
+      data: {
+        labels: data.map((_, i) => i),
+        datasets: [{ data, borderColor: color, backgroundColor: color + '22', borderWidth: 1.5, pointRadius: 0, fill: true, tension: 0.4 }]
+      },
+      options: {
+        responsive: false,
+        animation: false,
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        scales: { x: { display: false }, y: { display: false } },
+        elements: { line: { borderCapStyle: 'round' } }
+      }
+    });
+  }
+
+  buildSparkline('sparkline-rgi', rgiVals, STR_GREEN);
+  buildSparkline('sparkline-revpar', revparVals, STR_BLUE);
+  buildSparkline('sparkline-ari', ariVals, STR_PURPLE);
+
+  // Win ring: 100% filled
+  const circumference = 2 * Math.PI * 28;
+  document.getElementById('win-ring-arc').setAttribute('stroke-dasharray', `${circumference} ${circumference}`);
+}
+
+// ─── INSIGHTS ENGINE ──────────────────────────────────────────────────────────
+function buildInsightsEngine() {
+  const insights = [
+    { text: '<strong>93-week competitive win streak</strong> and counting — SpringHill Suites Lakeland has never lost a week to the comp set in our data. RGI above 100 every single week since Jan 2024.' },
+    { text: '<strong>February 2026 posted the highest RevPAR in property history:</strong> $210.11 — driven by ADR of $236.88 and 88.7% occupancy. Now the benchmark month.' },
+    { text: '<strong>Summer dominance:</strong> Jul–Aug average RGI 144.9 — far above the 128.8 all-time average. The comp set collapses in summer; SHS holds strong.' },
+    { text: '⚠️ <strong>December 2025 flag:</strong> Monthly figure (RGI 111.2, RevPAR $59.19) based on only 1 weekly record (week of 12-21). Full month data pending — not representative of actual Dec performance.' },
+    { text: '<strong>ADR has risen every January:</strong> $165.93 → $173.49 → $182.23 — 10% cumulative growth over 3 years. Rate premium is durable.' },
+    { text: '<strong>Record week:</strong> Week of 2024-09-01 — RGI 187.0. Occupancy gap was extraordinary: SHS at 73.5% vs comp set at 44.9%. MPI of 163.5 drove it all.' },
+    { text: '<strong>2026 YTD running 8.9% ahead of 2025 RevPAR</strong> ($191.50 vs $175.84 for same period). Spring strength continuing.' },
   ];
 
-  document.getElementById('str-kpi-grid').innerHTML = cards.map(c => `
-    <div class="str-kpi-card">
-      <div class="str-kpi-label">${c.label}</div>
-      <div class="str-kpi-value${c.amber ? ' amber' : ''}">${c.value}</div>
-      <div class="str-kpi-index ${c.above ? 'above' : 'below'}">${typeof c.index === 'string' && c.index.length > 5 ? c.index : 'Index: ' + c.index} ${c.above ? '▲' : '▼'}</div>
-      <div class="str-kpi-sub">${c.sub} · ${c.indexLabel}</div>
-    </div>
-  `).join('');
+  const textEl = document.getElementById('insights-text');
+  const dotsEl = document.getElementById('insights-dots');
+  let current = 0;
+
+  dotsEl.innerHTML = insights.map((_, i) =>
+    `<div class="str-insights-dot${i===0?' active':''}" id="idot-${i}"></div>`
+  ).join('');
+
+  function showInsight(idx) {
+    textEl.innerHTML = insights[idx].text;
+    dotsEl.querySelectorAll('.str-insights-dot').forEach((d, i) => {
+      d.classList.toggle('active', i === idx);
+    });
+    current = idx;
+  }
+
+  showInsight(0);
+  setInterval(() => {
+    showInsight((current + 1) % insights.length);
+  }, 8000);
 }
 
-function buildSTRT12KPIs() {
-  const d = strT12;
-  const cards = [
-    {
-      label: 'T12 Occupancy',
-      value: d.occ.toFixed(1) + '%',
-      index: d.mpiIdx.toFixed(1),
-      sub: 'Comp: ' + d.occC.toFixed(1) + '%',
-      above: d.mpiIdx >= 100,
-    },
-    {
-      label: 'T12 ADR',
-      value: '$' + d.adr.toFixed(2),
-      index: d.ariIdx.toFixed(1),
-      sub: 'Comp: $' + d.adrC.toFixed(2),
-      above: d.ariIdx >= 100,
-    },
-    {
-      label: 'T12 RevPAR',
-      value: '$' + d.revpar.toFixed(2),
-      index: (d.revpar / d.revparC * 100).toFixed(1),
-      sub: 'Comp: $' + d.revparC.toFixed(2),
-      above: d.revpar >= d.revparC,
-    },
-    {
-      label: 'T12 RGI',
-      value: d.rgi.toFixed(1),
-      index: '+' + (d.rgi - 100).toFixed(1) + ' pts vs parity',
-      sub: 'Apr 2025 – Mar 2026',
-      above: true,
-      amber: true,
-    },
-  ];
-
-  document.getElementById('str-t12-grid').innerHTML = cards.map(c => `
-    <div class="str-kpi-card">
-      <div class="str-kpi-label">${c.label}</div>
-      <div class="str-kpi-value${c.amber ? ' amber' : ''}">${c.value}</div>
-      <div class="str-kpi-index ${c.above ? 'above' : 'below'}">${typeof c.index === 'string' && c.index.length > 5 ? c.index : 'Index: ' + c.index} ${c.above ? '▲' : '▼'}</div>
-      <div class="str-kpi-sub">${c.sub}</div>
-    </div>
-  `).join('');
-}
-
-function buildSTRRevparChart() {
+// ─── B1. RevPAR TREND CHART ───────────────────────────────────────────────────
+function buildRevPARTrendChart() {
   const ctx = document.getElementById('strRevparChart').getContext('2d');
-  const labels = strWeekly.map(d => d.w.slice(0,7));
+  const weekly = STR_DATA.weekly;
+  const labels = weekly.map(w => w.weekStart);
+  const propData = weekly.map(w => w.revparProp);
+  const compData = weekly.map(w => w.revparComp);
+
+  // Build seasonal band plugins using ReferenceArea approach via custom plugin
+  const seasonBands = computeSeasonalBands(weekly);
+
   new Chart(ctx, {
     type: 'line',
     data: {
@@ -1608,251 +1433,471 @@ function buildSTRRevparChart() {
       datasets: [
         {
           label: 'SHS RevPAR',
-          data: strWeekly.map(d => d.revpar),
-          borderColor: AMBER,
-          backgroundColor: 'rgba(245,158,11,0.08)',
+          data: propData,
+          borderColor: STR_BLUE,
+          backgroundColor: 'rgba(96,165,250,0.08)',
           borderWidth: 2,
           pointRadius: 0,
           tension: 0.3,
           fill: true,
+          order: 2,
         },
         {
           label: 'Comp Set RevPAR',
-          data: strWeekly.map(d => d.revparC),
-          borderColor: BLUE,
+          data: compData,
+          borderColor: STR_SLATE,
           backgroundColor: 'transparent',
           borderWidth: 1.5,
+          borderDash: [5, 3],
           pointRadius: 0,
           tension: 0.3,
+          order: 2,
         },
       ],
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
       plugins: {
-        legend: { labels: { color: '#9ca3af', boxWidth: 10, padding: 12 } },
-        tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ': $' + Number(ctx.raw).toFixed(2) } },
+        legend: { labels: { color: '#94a3b8', boxWidth: 12, padding: 16 } },
+        tooltip: {
+          callbacks: {
+            title: items => 'Week of ' + items[0].label,
+            label: item => ' ' + item.dataset.label + ': $' + Number(item.raw).toFixed(2),
+            afterBody: items => {
+              if (items.length >= 2) {
+                const gap = Number(items[0].raw) - Number(items[1].raw);
+                return ['', ' Gap: $' + gap.toFixed(2) + ' (' + (gap / Number(items[1].raw) * 100).toFixed(1) + '%)'];
+              }
+              return [];
+            }
+          }
+        },
       },
       scales: {
-        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280', maxTicksLimit: 12 } },
-        y: {
+        x: {
           grid: { color: 'rgba(255,255,255,0.04)' },
-          ticks: { color: '#6b7280', callback: v => '$' + v },
+          ticks: { color: '#64748b', maxTicksLimit: 10, callback: (val, idx) => {
+            const d = labels[idx];
+            if (!d) return '';
+            return d.slice(0, 7);
+          }},
+        },
+        y: {
+          min: 0,
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: { color: '#64748b', callback: v => '$' + v },
         },
       },
     },
+    plugins: [{
+      id: 'seasonBands',
+      beforeDraw(chart) {
+        const { ctx: c, chartArea, scales: { x, y } } = chart;
+        if (!chartArea) return;
+        const { top, bottom } = chartArea;
+
+        seasonBands.forEach(band => {
+          const x0 = x.getPixelForValue(band.startIdx);
+          const x1 = x.getPixelForValue(band.endIdx);
+          c.save();
+          c.fillStyle = band.season === 'peak'
+            ? 'rgba(74,222,128,0.07)'
+            : band.season === 'trough'
+            ? 'rgba(248,113,113,0.07)'
+            : 'rgba(251,191,36,0.05)';
+          c.fillRect(x0, top, x1 - x0, bottom - top);
+          c.restore();
+        });
+      }
+    }]
   });
 }
 
-function buildSTRRgiChart() {
+// Compute contiguous seasonal bands for weekly data
+function computeSeasonalBands(weekly) {
+  const bands = [];
+  let currentSeason = null, startIdx = 0;
+
+  weekly.forEach((w, i) => {
+    const s = getSeason(w.month);
+    if (s !== currentSeason) {
+      if (currentSeason !== null) {
+        bands.push({ season: currentSeason, startIdx, endIdx: i - 1 });
+      }
+      currentSeason = s;
+      startIdx = i;
+    }
+    if (i === weekly.length - 1) {
+      bands.push({ season: currentSeason, startIdx, endIdx: i });
+    }
+  });
+
+  return bands;
+}
+
+// ─── B2. COMPETITIVE DOMINANCE CHART ─────────────────────────────────────────
+function buildRGICompetitiveDominanceChart() {
   const ctx = document.getElementById('strRgiChart').getContext('2d');
-  const labels = strWeekly.map(d => d.w.slice(0,7));
+  const weekly = STR_DATA.weekly;
+  const labels = weekly.map(w => w.weekStart);
+  const rgiData = weekly.map(w => w.rgi);
+  const rolling13 = computeRollingAvg(rgiData, 13);
+
+  // Color each RGI point by zone
+  const pointColors = rgiData.map(v => v >= 130 ? STR_GREEN : v >= 100 ? STR_BLUE : STR_RED);
+
   new Chart(ctx, {
     type: 'line',
     data: {
       labels,
       datasets: [
         {
-          label: 'RGI',
-          data: strWeekly.map(d => d.rgi),
-          borderColor: AMBER,
-          backgroundColor: 'rgba(245,158,11,0.1)',
-          borderWidth: 2,
+          label: 'Weekly RGI',
+          data: rgiData,
+          borderColor: STR_BLUE,
+          backgroundColor: 'transparent',
+          borderWidth: 1.5,
+          pointRadius: rgiData.map(v => 3),
+          pointBackgroundColor: pointColors,
+          pointBorderColor: pointColors,
+          tension: 0.2,
+          order: 2,
+        },
+        {
+          label: '13-Week Rolling Avg',
+          data: rolling13,
+          borderColor: STR_PURPLE,
+          backgroundColor: 'transparent',
+          borderWidth: 2.5,
           pointRadius: 0,
-          tension: 0.3,
-          fill: true,
+          tension: 0.4,
+          order: 1,
         },
       ],
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
       plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: ctx => ' RGI: ' + Number(ctx.raw).toFixed(1) } },
+        legend: { labels: { color: '#94a3b8', boxWidth: 12, padding: 16 } },
+        tooltip: {
+          callbacks: {
+            title: items => 'Week of ' + items[0].label,
+            label: item => {
+              const w = weekly[item.dataIndex];
+              if (!w) return '';
+              if (item.datasetIndex === 0) return ` RGI: ${item.raw.toFixed(1)} | MPI: ${w.mpi.toFixed(1)} | ARI: ${w.ari.toFixed(1)}`;
+              return ` 13wk Avg: ${Number(item.raw).toFixed(1)}`;
+            },
+          }
+        },
       },
       scales: {
-        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280', maxTicksLimit: 12 } },
-        y: {
-          min: 90, max: 200,
+        x: {
           grid: { color: 'rgba(255,255,255,0.04)' },
-          ticks: { color: '#6b7280' },
+          ticks: { color: '#64748b', maxTicksLimit: 10, callback: (val, idx) => labels[idx] ? labels[idx].slice(0, 7) : '' },
+        },
+        y: {
+          min: 85, max: 200,
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: { color: '#64748b' },
         },
       },
     },
     plugins: [{
-      id: 'rgiBaseline',
-      afterDraw(chart) {
-        const { ctx: c, chartArea: { left, right }, scales: { y } } = chart;
+      id: 'rgiZones',
+      beforeDraw(chart) {
+        const { ctx: c, chartArea, scales: { x, y } } = chart;
+        if (!chartArea) return;
+        const { left, right, top, bottom } = chartArea;
+
+        // Zone backgrounds
+        const y130 = y.getPixelForValue(130);
         const y100 = y.getPixelForValue(100);
+
         c.save();
-        c.strokeStyle = 'rgba(239,68,68,0.7)';
+        // Dominant zone (≥130)
+        c.fillStyle = 'rgba(74,222,128,0.06)';
+        c.fillRect(left, top, right - left, y130 - top);
+
+        // Winning zone (100–129)
+        c.fillStyle = 'rgba(96,165,250,0.06)';
+        c.fillRect(left, y130, right - left, y100 - y130);
+
+        // Losing zone (<100)
+        c.fillStyle = 'rgba(248,113,113,0.06)';
+        c.fillRect(left, y100, right - left, bottom - y100);
+
+        // Parity line
+        c.strokeStyle = 'rgba(248,113,113,0.6)';
         c.lineWidth = 1.5;
-        c.setLineDash([5,5]);
+        c.setLineDash([5, 4]);
         c.beginPath(); c.moveTo(left, y100); c.lineTo(right, y100); c.stroke();
-        c.fillStyle = '#ef4444';
+        c.setLineDash([]);
+        c.fillStyle = '#f87171';
+        c.font = 'bold 10px Inter, system-ui';
+        c.fillText('100 = Parity', right - 80, y100 - 4);
+
+        // Dominant threshold
+        c.strokeStyle = 'rgba(74,222,128,0.3)';
+        c.lineWidth = 1;
+        c.setLineDash([3, 4]);
+        c.beginPath(); c.moveTo(left, y130); c.lineTo(right, y130); c.stroke();
+        c.setLineDash([]);
+        c.fillStyle = '#4ade80';
         c.font = '10px Inter, system-ui';
-        c.fillText('100 = parity', right - 72, y100 - 4);
+        c.fillText('130 = Dominant', right - 90, y130 - 4);
+
         c.restore();
       },
-    }],
+      afterDraw(chart) {
+        // Annotate record high and low
+        const { ctx: c, scales: { x, y } } = chart;
+        const highIdx = STR_DATA.weekly.findIndex(w => w.weekStart === '2024-09-01');
+        const lowIdx = STR_DATA.weekly.findIndex(w => w.weekStart === '2024-04-07');
+
+        if (highIdx >= 0) {
+          const px = x.getPixelForValue(highIdx);
+          const py = y.getPixelForValue(187.0);
+          c.save();
+          c.fillStyle = STR_AMBER;
+          c.font = 'bold 10px Inter, system-ui';
+          c.textAlign = 'center';
+          c.fillText('⭐ 187.0', px, py - 14);
+          c.fillText('Record High', px, py - 4);
+          c.restore();
+        }
+        if (lowIdx >= 0) {
+          const px = x.getPixelForValue(lowIdx);
+          const py = y.getPixelForValue(100.1);
+          c.save();
+          c.fillStyle = '#f87171';
+          c.font = '10px Inter, system-ui';
+          c.textAlign = 'center';
+          c.fillText('100.1', px, py + 14);
+          c.restore();
+        }
+      }
+    }]
   });
 }
 
-function buildSTROccAdrChart() {
-  const ctx = document.getElementById('strOccAdrChart').getContext('2d');
-  const labels = strMonthly.map(d => d.p.slice(0,7));
+// ─── C1. INDEX DECOMPOSITION CHART ────────────────────────────────────────────
+function buildIndexDecompositionChart() {
+  const ctx = document.getElementById('strIndexChart').getContext('2d');
+  const monthly = STR_DATA.monthly;
+  const labels = monthly.map(m => m.period);
+  const mpiData = monthly.map(m => m.mpi);
+  const ariData = monthly.map(m => m.ari);
+  const rgiData = monthly.map(m => m.rgi);
+
   new Chart(ctx, {
     type: 'bar',
     data: {
       labels,
       datasets: [
         {
-          label: 'Occ% Prop',
-          data: strMonthly.map(d => d.occ),
-          backgroundColor: 'rgba(245,158,11,0.4)',
-          borderColor: AMBER,
+          label: 'MPI (Occ Index)',
+          data: mpiData,
+          backgroundColor: 'rgba(74,222,128,0.5)',
+          borderColor: STR_GREEN,
           borderWidth: 1,
           borderRadius: 3,
-          yAxisID: 'yOcc',
+          order: 2,
         },
         {
-          label: 'Occ% Comp',
-          data: strMonthly.map(d => d.occC),
-          backgroundColor: 'rgba(96,165,250,0.25)',
-          borderColor: BLUE,
+          label: 'ARI (Rate Index)',
+          data: ariData,
+          backgroundColor: 'rgba(96,165,250,0.5)',
+          borderColor: STR_BLUE,
           borderWidth: 1,
           borderRadius: 3,
-          yAxisID: 'yOcc',
+          order: 2,
         },
         {
-          label: 'ADR Prop',
-          data: strMonthly.map(d => d.adr),
+          label: 'RGI',
           type: 'line',
-          borderColor: GREEN,
+          data: rgiData,
+          borderColor: STR_AMBER,
           backgroundColor: 'transparent',
-          borderWidth: 2,
-          pointRadius: 2,
+          borderWidth: 2.5,
+          pointRadius: 3,
+          pointBackgroundColor: STR_AMBER,
           tension: 0.3,
-          yAxisID: 'yAdr',
+          order: 1,
         },
       ],
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
       plugins: {
-        legend: { labels: { color: '#9ca3af', boxWidth: 10, padding: 10, font: { size: 10 } } },
-        tooltip: { mode: 'index', intersect: false },
+        legend: { labels: { color: '#94a3b8', boxWidth: 12, padding: 12 } },
+        tooltip: {
+          callbacks: {
+            title: items => items[0].label,
+            label: item => {
+              if (item.dataset.label === 'RGI') return ` RGI: ${Number(item.raw).toFixed(1)}`;
+              if (item.dataset.label === 'MPI (Occ Index)') {
+                const m = monthly[item.dataIndex];
+                const lead = m && m.mpi > m.ari ? ' (Demand-led)' : '';
+                return ` MPI: ${Number(item.raw).toFixed(1)}${lead}`;
+              }
+              if (item.dataset.label === 'ARI (Rate Index)') {
+                const m = monthly[item.dataIndex];
+                const lead = m && m.ari > m.mpi ? ' (Rate-led)' : '';
+                return ` ARI: ${Number(item.raw).toFixed(1)}${lead}`;
+              }
+              return ` ${item.dataset.label}: ${Number(item.raw).toFixed(1)}`;
+            }
+          }
+        },
       },
       scales: {
-        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280', maxTicksLimit: 9, font: { size: 9 } } },
-        yOcc: {
-          type: 'linear', position: 'left',
-          min: 40, max: 100,
+        x: {
           grid: { color: 'rgba(255,255,255,0.04)' },
-          ticks: { color: '#6b7280', callback: v => v + '%', font: { size: 10 } },
+          ticks: { color: '#64748b', maxTicksLimit: 9, maxRotation: 45 },
         },
-        yAdr: {
-          type: 'linear', position: 'right',
-          min: 80, max: 280,
-          grid: { display: false },
-          ticks: { color: '#6b7280', callback: v => '$' + v, font: { size: 10 } },
-        },
-      },
-    },
-  });
-}
-
-function buildSTRYoyChart() {
-  const ctx = document.getElementById('strYoyChart').getContext('2d');
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: strYoY.months,
-      datasets: [
-        {
-          label: '2024',
-          data: strYoY.revpar2024,
-          backgroundColor: 'rgba(96,165,250,0.4)',
-          borderColor: BLUE,
-          borderWidth: 1.5,
-          borderRadius: 4,
-        },
-        {
-          label: '2025',
-          data: strYoY.revpar2025,
-          backgroundColor: 'rgba(167,139,250,0.4)',
-          borderColor: PURPLE,
-          borderWidth: 1.5,
-          borderRadius: 4,
-        },
-        {
-          label: '2026 YTD',
-          data: strYoY.revpar2026,
-          backgroundColor: 'rgba(245,158,11,0.5)',
-          borderColor: AMBER,
-          borderWidth: 1.5,
-          borderRadius: 4,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { labels: { color: '#9ca3af', boxWidth: 10, padding: 10 } },
-        tooltip: { callbacks: { label: ctx => ' ' + ctx.dataset.label + ': $' + (ctx.raw ? Number(ctx.raw).toFixed(2) : '—') } },
-      },
-      scales: {
-        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b7280' } },
         y: {
+          min: 85,
           grid: { color: 'rgba(255,255,255,0.04)' },
-          ticks: { color: '#6b7280', callback: v => '$' + v },
+          ticks: { color: '#64748b' },
         },
       },
     },
+    plugins: [{
+      id: 'parityLine',
+      afterDraw(chart) {
+        const { ctx: c, chartArea: { left, right }, scales: { y } } = chart;
+        const y100 = y.getPixelForValue(100);
+        c.save();
+        c.strokeStyle = 'rgba(71,85,105,0.6)';
+        c.lineWidth = 1;
+        c.setLineDash([4, 4]);
+        c.beginPath(); c.moveTo(left, y100); c.lineTo(right, y100); c.stroke();
+        c.setLineDash([]);
+        c.fillStyle = '#475569';
+        c.font = '10px Inter, system-ui';
+        c.fillText('100 = parity', right - 70, y100 - 3);
+        c.restore();
+      }
+    }]
   });
 }
 
-function buildSTRBestWorst() {
-  document.getElementById('str-best-weeks').innerHTML = strBest.map(w => `
-    <div class="str-bw-row">
-      <span class="str-bw-week">${w.w}</span>
-      <div class="str-bw-metrics">
-        <span class="str-bw-detail">Occ ${w.occ}% · ADR $${w.adr.toFixed(0)} · RevPAR $${w.revpar.toFixed(0)}</span>
-        <span class="str-bw-rgi-best">RGI ${w.rgi}</span>
-      </div>
-    </div>
-  `).join('');
+// ─── C2. SEASONAL HEATMAP ─────────────────────────────────────────────────────
+function buildSeasonalHeatmap() {
+  const wrap = document.getElementById('str-heatmap-wrap');
+  const monthLabels = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const years = [2024, 2025, 2026];
 
-  document.getElementById('str-worst-weeks').innerHTML = strWorst.map(w => `
-    <div class="str-bw-row">
-      <span class="str-bw-week">${w.w}</span>
-      <div class="str-bw-metrics">
-        <span class="str-bw-detail">Occ ${w.occ}% · ADR $${w.adr.toFixed(0)} · RevPAR $${w.revpar.toFixed(0)}</span>
-        <span class="str-bw-rgi-worst">RGI ${w.rgi}</span>
-      </div>
+  // Build lookup: {year: {month: record}}
+  const lookup = {};
+  STR_DATA.monthly.forEach(m => {
+    if (!lookup[m.year]) lookup[m.year] = {};
+    lookup[m.year][m.month] = m;
+  });
+
+  // Compute min/max for color scale
+  const allRGI = STR_DATA.monthly.map(m => m.rgi);
+  const minRGI = Math.min(...allRGI);
+  const maxRGI = Math.max(...allRGI);
+
+  let html = '<table class="str-heatmap-table"><thead><tr><th></th>';
+  monthLabels.forEach(m => { html += `<th>${m}</th>`; });
+  html += '</tr></thead><tbody>';
+
+  years.forEach(year => {
+    const isCurrent = year === 2026;
+    html += `<tr><td class="str-year-label${isCurrent?' current':''}">${year}</td>`;
+    for (let mo = 1; mo <= 12; mo++) {
+      const rec = lookup[year] && lookup[year][mo];
+      if (!rec) {
+        html += `<td class="str-heatmap-cell empty">—</td>`;
+        continue;
+      }
+      const color = heatmapColor(rec.rgi, minRGI, maxRGI);
+      const isAnomaly = year === 2025 && mo === 12;
+      const anomalyClass = isAnomaly ? ' anomaly' : '';
+      const anomalyTitle = isAnomaly ? ' title="Dec 2025 based on 1 weekly record (week of 12-21). Full month data pending."' : '';
+      const textColor = rec.rgi > (minRGI + maxRGI) / 2 ? '#0f172a' : '#fff';
+
+      html += `<td class="str-heatmap-cell${anomalyClass}" style="background:${color};color:${textColor};"${anomalyTitle}>${rec.rgi.toFixed(1)}</td>`;
+    }
+    html += '</tr>';
+  });
+
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+}
+
+// ─── D. RECORDS SECTION ───────────────────────────────────────────────────────
+function buildRecordsSection() {
+  const r = STR_DATA.records;
+  const records = [
+    { icon: '🏆', value: 'RGI 187.0', label: 'Highest RGI Week', when: 'Week of 2024-09-01' },
+    { icon: '💰', value: '$210.11', label: 'Highest RevPAR Month', when: 'February 2026' },
+    { icon: '🔥', value: '93 Weeks', label: 'Active Win Streak', when: '2024-01-07 – present · RGI > 100' },
+    { icon: '☀️', value: 'RGI 152.6', label: 'Best Summer Month', when: 'August 2024' },
+    { icon: '📈', value: '$324.25', label: 'Highest Single-Week RevPAR', when: 'Week of 2025-03-30' },
+    { icon: '🏨', value: '98.6%', label: 'Highest Occupancy Week', when: 'Week of 2024-10-13' },
+  ];
+
+  document.getElementById('str-records-grid').innerHTML = records.map(r => `
+    <div class="str-record-card">
+      <div class="str-record-icon">${r.icon}</div>
+      <div class="str-record-value">${r.value}</div>
+      <div class="str-record-label">${r.label}</div>
+      <div class="str-record-when">${r.when}</div>
     </div>
   `).join('');
 }
 
-function buildSTRMonthlyTable() {
+// ─── D. BEST / WORST TABLES ───────────────────────────────────────────────────
+function buildBestWorstTables() {
+  const r = STR_DATA.records;
+  const seasonLabel = { peak: '🌸 Peak', shoulder: '🌥️ Shoulder', trough: '🌞 Trough' };
+
+  document.getElementById('str-best-weeks').innerHTML = r.top10WeeksByRGI.slice(0, 5).map(w => `
+    <div class="str-bw-row">
+      <span class="str-bw-week">${w.weekStart}</span>
+      <span class="str-bw-detail">${seasonLabel[w.season] || w.season} · RevPAR $${w.revparProp.toFixed(0)} · MPI ${w.mpi}</span>
+      <span class="str-bw-rgi-best">${w.rgi.toFixed(1)}</span>
+    </div>
+  `).join('');
+
+  document.getElementById('str-worst-weeks').innerHTML = r.bottom10WeeksByRGI.slice(0, 5).map(w => `
+    <div class="str-bw-row">
+      <span class="str-bw-week">${w.weekStart}</span>
+      <span class="str-bw-detail">${seasonLabel[w.season] || w.season} · RevPAR $${w.revparProp.toFixed(0)} · MPI ${w.mpi}</span>
+      <span class="str-bw-rgi-worst">${w.rgi.toFixed(1)}</span>
+    </div>
+  `).join('');
+}
+
+// ─── E. MONTHLY DATA TABLE ────────────────────────────────────────────────────
+function buildMonthlyDataTable() {
   const tbody = document.getElementById('str-monthly-tbody');
-  tbody.innerHTML = strMonthly.map(d => {
-    const rgiClass = d.rgi >= 130 ? 'pos' : d.rgi >= 115 ? '' : 'neg';
-    return `<tr>
-      <td>${d.p}</td>
-      <td>${d.occ.toFixed(1)}%</td>
-      <td>${d.occC.toFixed(1)}%</td>
-      <td class="${d.mpi >= 100 ? '' : 'neg'}">${d.mpi.toFixed(1)}</td>
-      <td>$${d.adr.toFixed(2)}</td>
-      <td>$${d.adrC.toFixed(2)}</td>
-      <td class="${d.ari >= 100 ? '' : 'neg'}">${d.ari.toFixed(1)}</td>
-      <td>$${d.revpar.toFixed(2)}</td>
-      <td>$${d.revparC.toFixed(2)}</td>
-      <td class="${rgiClass}">${d.rgi.toFixed(1)}</td>
+  tbody.innerHTML = STR_DATA.monthly.map(d => {
+    const rgiClass = d.rgi >= 130 ? 'rgi-dominant' : d.rgi >= 100 ? 'rgi-winning' : 'rgi-losing';
+    const mpiClass = d.mpi >= 100 ? '' : 'style="color:var(--str-accent-red)"';
+    const ariClass = d.ari >= 100 ? '' : 'style="color:var(--str-accent-red)"';
+    const dec25Flag = (d.period === '2025-12') ? ' title="⚠️ Dec 2025: 1 weekly record only. Not representative of full month."' : '';
+    return `<tr${dec25Flag}>
+      <td>${d.period}${d.period === '2025-12' ? ' ⚠️' : ''}</td>
+      <td>${(d.occProp * 100).toFixed(1)}%</td>
+      <td>${(d.occComp * 100).toFixed(1)}%</td>
+      <td ${mpiClass}>${d.mpi.toFixed(1)}</td>
+      <td>$${d.adrProp.toFixed(2)}</td>
+      <td>$${d.adrComp.toFixed(2)}</td>
+      <td ${ariClass}>${d.ari.toFixed(1)}</td>
+      <td>$${d.revparProp.toFixed(2)}</td>
+      <td>$${d.revparComp.toFixed(2)}</td>
+      <td><span class="${rgiClass}">${d.rgi.toFixed(1)}</span></td>
     </tr>`;
   }).join('');
 }

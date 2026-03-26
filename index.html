@@ -314,14 +314,20 @@
     /* ── TAB NAV ── */
     .tab-nav {
       display: flex;
+      align-items: center;
       gap: 4px;
       border-bottom: 1px solid var(--border);
-      padding: 0 32px;
+      padding: 0 16px;
       background: var(--surface);
       position: sticky;
       top: 61px;
       z-index: 99;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      flex-wrap: nowrap;
     }
+    .tab-nav::-webkit-scrollbar { display: none; }
     .tab-btn {
       background: none;
       border: none;
@@ -721,6 +727,24 @@
       color: var(--text-muted);
     }
 
+    /* ── GLOBAL OVERFLOW GUARD ── */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { max-width: 100%; overflow-x: hidden; }
+    main, .str-main { min-width: 0; }
+    .chart-card, .str-chart-card { min-width: 0; overflow: hidden; }
+    canvas { max-width: 100% !important; }
+
+    /* ── HEADER — stack on small screens ── */
+    @media (max-width: 640px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 14px 16px;
+      }
+      .header-right { text-align: left; font-size: 11px; }
+    }
+
     /* RESPONSIVE */
     @media (max-width: 900px) {
       header { padding: 16px 20px; }
@@ -743,6 +767,9 @@
       .str-hero-grid { grid-template-columns: 1fr 1fr; }
       .str-hero-value { font-size: 24px; }
       .str-records-grid { grid-template-columns: 1fr; }
+      .loan-grid { grid-template-columns: 1fr; }
+      .refi-banner { flex-direction: column; gap: 12px; }
+      .str-bw-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -782,7 +809,8 @@
   <nav class="tab-nav">
     <button class="tab-btn active" onclick="switchTab('financial', this)">📊 Financial</button>
     <button class="tab-btn" onclick="switchTab('str', this)">🏆 STR Performance</button>
-   <a href="/classic" style="font-size:11px;color:#475569;text-decoration:none;margin-left:16px;font-family:-apple-system,sans-serif;">Classic View</a></nav>
+    <a href="/classic" style="font-size:11px;color:#475569;text-decoration:none;margin-left:12px;font-family:-apple-system,sans-serif;white-space:nowrap;align-self:center;flex-shrink:0;">Classic View</a>
+  </nav>
 
   <!-- ═══════════════════════════════════════════════════════════════ -->
   <!-- FINANCIAL TAB -->
